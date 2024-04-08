@@ -18,7 +18,7 @@ struct DataMemory {
  * Initializing DM with values
  * @param mem : refrence to the DM
  */
-void IMInit(DataMemory *mem){
+void DMInit(DataMemory *mem){
     for (int i = 0; i < DATA_MEM_SIZE ; ++i) {
         mem->Dmemory[i] = 0 ;
     }
@@ -30,7 +30,7 @@ void IMInit(DataMemory *mem){
  * @param address : address is 16 bit because DATA_MEM_SIZE =2024 So
  *                  log(2024) =10.9 --> 16
  */
-uint16_t IMRead(DataMemory *mem, uint16_t address){
+uint16_t DMRead(DataMemory *mem, uint16_t address){
     if(address >= DATA_MEM_SIZE){
         printf("This Address not in Data Memory range of Addresses");
         return -1 ;
@@ -44,7 +44,7 @@ uint16_t IMRead(DataMemory *mem, uint16_t address){
  *                  log(2024) =10.9 --> 16
  * @param data : data is 16 bit because WORD_SIZE = 16
  */
-void IMWrite(DataMemory *mem, uint16_t address, uint16_t data){
+void DMWrite(DataMemory *mem, uint16_t address, uint16_t data){
     if(address >= DATA_MEM_SIZE){
         printf("This Address not in Data Memory range of Addresses");
         return  ;
