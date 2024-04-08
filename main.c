@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Instructions/Instruction.h"
 
 #define MAX_LINE_LENGTH 100
 
-void fetch (){
+Instruction[100] fetch (){
     FILE *file = fopen("E:\\Processor-design\\AssemblyProgramm.txt", "r");
     if (file == NULL) {
         perror("Error opening file");
