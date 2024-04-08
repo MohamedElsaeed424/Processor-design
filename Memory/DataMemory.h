@@ -23,7 +23,6 @@ void DMInit(DataMemory *mem){
         mem->Dmemory[i] = 0 ;
     }
 }
-
 /**
  * Reading from DM
  * @param mem : refrence to the DM
