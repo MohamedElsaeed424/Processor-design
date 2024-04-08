@@ -6,3 +6,7 @@
 #define PROCESSOR_DESIGN_I_FORMAT_H
 
 #endif //PROCESSOR_DESIGN_I_FORMAT_H
+
+struct I-Format {
+
+};
