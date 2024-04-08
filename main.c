@@ -5,11 +5,11 @@
 
 #define MAX_LINE_LENGTH 100
 
-Instruction[100] fetch (){
+struct InstructionsArr fetch (){
     FILE *file = fopen("E:\\Processor-design\\AssemblyProgramm.txt", "r");
     if (file == NULL) {
         perror("Error opening file");
-        return;
+        return (void)* NULL;
     }
 
     char line[MAX_LINE_LENGTH];

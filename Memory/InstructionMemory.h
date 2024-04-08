@@ -1,6 +1,6 @@
 #ifndef PROCESSOR_DESIGN_INSTRUCTIONMEMORY_H
 #define PROCESSOR_DESIGN_INSTRUCTIONMEMORY_H
-
+#include <stdint.h>
 #include <stdio.h>
 #define WORD_SIZE 16
 #define INSTRUCTION_MEM_SIZE 1024
