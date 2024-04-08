@@ -5,15 +5,16 @@
 
 #define MAX_LINE_LENGTH 100
 
-struct InstructionsArr* fetch (){
-    FILE *file = fopen("E:\\Processor-design\\AssemblyProgramm.txt", "r");
+InstructionsArr* fetch (){
+    char fileName []= "E:\\Processor-design\\AssemblyProgramm.txt" ;
+    FILE *file = fopen( fileName, "r");
     if (file == NULL) {
         perror("Error opening file");
         return NULL;
     }
 
     int instructionsArrIdx = 0 ;
-    InstructionsArr IArr ;
+    InstructionsArr* IArr = malloc(1024);
 
     char line[MAX_LINE_LENGTH];
 
@@ -45,18 +46,19 @@ struct InstructionsArr* fetch (){
                     strcpy(I.operation, instruction);
                     strcpy(I.firstOp, operand1);
                     strcpy(I.secondOp, operand2);
-
-                    IArr.Instructions[instructionsArrIdx] = I ;
+                    printf("%s %s %s \n" ,I.operation, I.firstOp ,I.secondOp ) ;
+                    InstructionArrWrite(IArr,I,instructionsArrIdx);
+                    ++instructionsArrIdx ;
                     // Print or process the parsed instruction and operands
                     printf("Instruction: %s, Operand1: %s, Operand2: %s\n", instruction, operand1, operand2);
                 } else {
-                    fprintf(stderr, "Error: Invalid format in line\n");
+                    printf( "Error: Invalid format in line\n");
                 }
             } else {
-                fprintf(stderr, "Error: Invalid format in line\n");
+                printf("Error: Invalid format in line\n");
             }
         } else {
-            fprintf(stderr, "Error: Empty line\n");
+            printf( "Error: Empty line\n");
         }
     }
     fclose(file);
@@ -64,5 +66,9 @@ struct InstructionsArr* fetch (){
 }
 
 int main(){
-    fetch() ;
+    InstructionsArr* ir ;
+    ir = fetch() ;
+    InstructionArrPrint(ir);
+    free(ir) ;
+    return 0 ;
 }

@@ -19,6 +19,8 @@ typedef struct {
     Instruction Instructions[INSTRUCTION_MEM_SIZE] ;
 }InstructionsArr;
 
+
+
 void InstructionArrWrite(InstructionsArr* Arr , Instruction I , uint16_t addres ) {
     Arr->Instructions[addres] = I ;
 };
