@@ -26,7 +26,7 @@ void InstructionArrWrite(InstructionsArr* Arr , Instruction I , uint16_t addres 
 };
 
 void InstructionArrPrint (InstructionsArr* Arr){
-    for (int i = 0; i < INSTRUCTION_MEM_SIZE; ++i) {
+    for (int i = 0; i < INSTRUCTION_MEM_SIZE ; ++i) {
         Instruction  I = Arr->Instructions[i] ;
         printf("operation: %s  ,first operand: %s,second operand %s \n" ,I.operation,I.firstOp,I.secondOp) ;
     }
