@@ -5,12 +5,12 @@
 #define WORD_SIZE 8
 #define DATA_MEM_SIZE 2024
 
-struct Word {
+typedef struct  Word {
     uint8_t size ;
 };
 
 // Array of words
-struct DataMemory {
+typedef struct DataMemory {
     Word Dmemory[DATA_MEM_SIZE];
 };
 
@@ -42,7 +42,7 @@ uint16_t DMRead(DataMemory *mem, uint16_t address){
  * @param mem : refrence to the DM
  * @param address : address is 16 bit because DATA_MEM_SIZE =2024 So
  *                  log(2024) =10.9 --> 16
- * @param data : data is 16 bit because WORD_SIZE = 16
+ * @param data : data is 8 bit because WORD_SIZE = 8
  */
 void DMWrite(DataMemory *mem, uint16_t address, uint16_t data){
     if(address >= DATA_MEM_SIZE){

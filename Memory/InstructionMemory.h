@@ -5,12 +5,12 @@
 #define WORD_SIZE 16
 #define INSTRUCTION_MEM_SIZE 1024
 
-struct Word {
+typedef struct Word {
     uint16_t size ;
 };
 
 // Array of words
-struct InstructionMemory {
+typedef struct InstructionMemory {
     Word Imemory[INSTRUCTION_MEM_SIZE];
 };
 
