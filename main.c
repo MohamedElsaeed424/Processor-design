@@ -5,12 +5,15 @@
 
 #define MAX_LINE_LENGTH 100
 
-struct InstructionsArr fetch (){
+struct InstructionsArr* fetch (){
     FILE *file = fopen("E:\\Processor-design\\AssemblyProgramm.txt", "r");
     if (file == NULL) {
         perror("Error opening file");
-        return (void)* NULL;
+        return NULL;
     }
+
+    int instructionsArrIdx = 0 ;
+    InstructionsArr IArr ;
 
     char line[MAX_LINE_LENGTH];
 
@@ -21,9 +24,9 @@ struct InstructionsArr fetch (){
 
         // Assuming each line has three tokens: instruction, operand1, operand2
         if (token != NULL) {
-            char instruction[MAX_LINE_LENGTH];
-            char operand1[MAX_LINE_LENGTH];
-            char operand2[MAX_LINE_LENGTH];
+            char instruction[4];
+            char operand1[6];
+            char operand2[6];
 
             // Copy the first token (instruction)
             strcpy(instruction, token);
@@ -37,7 +40,13 @@ struct InstructionsArr fetch (){
                 token = strtok(NULL, " \n");
                 if (token != NULL) {
                     strcpy(operand2, token);
+                    Instruction I  ;
+                    //assigning the value of the instruction
+                    strcpy(I.operation, instruction);
+                    strcpy(I.firstOp, operand1);
+                    strcpy(I.secondOp, operand2);
 
+                    IArr.Instructions[instructionsArrIdx] = I ;
                     // Print or process the parsed instruction and operands
                     printf("Instruction: %s, Operand1: %s, Operand2: %s\n", instruction, operand1, operand2);
                 } else {
@@ -51,6 +60,7 @@ struct InstructionsArr fetch (){
         }
     }
     fclose(file);
+    return IArr ;
 }
 
 int main(){
