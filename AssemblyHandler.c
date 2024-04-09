@@ -14,7 +14,7 @@
 
 /**
  * Reading from assembly text file and store all instructions
- * and operands to array of instruction
+ * and secondOperands to array of instruction
  * @return
  */
 InstructionsArr *ReadAssemblyTextFile() {
@@ -40,34 +40,34 @@ InstructionsArr *ReadAssemblyTextFile() {
             // Tokenize the line using strtok
             char *token = strtok(line, " \n");
 
-            // Assuming each line has three tokens: instruction, operand1, operand2
+            // Assuming each line has three tokens: instruction, secondOperand1, secondOperand2
             if (token != NULL) {
                 char instruction[4];
-                char operand1[6];
-                char operand2[6];
+                char secondOperand1[6];
+                char secondOperand2[6];
 
                 // Copy the first token (instruction)
                 strcpy(instruction, token);
 
-                // Get the next token (operand1)
+                // Get the next token (secondOperand1)
                 token = strtok(NULL, " \n");
                 if (token != NULL) {
-                    strcpy(operand1, token);
+                    strcpy(secondOperand1, token);
 
-                    // Get the third token (operand2)
+                    // Get the third token (secondOperand2)
                     token = strtok(NULL, " \n");
                     if (token != NULL) {
-                        strcpy(operand2, token);
+                        strcpy(secondOperand2, token);
                         Instruction I;
                         //assigning the value of the instruction
                         strcpy(I.operation, instruction);
-                        strcpy(I.firstOp, operand1);
-                        strcpy(I.secondOp, operand2);
+                        strcpy(I.firstOp, secondOperand1);
+                        strcpy(I.secondOp, secondOperand2);
 //                    printf("%s %s %s \n" ,I.operation, I.firstOp ,I.secondOp ) ;
                         InstructionArrWrite(IArr, I, instructionsArrIdx);
                         ++instructionsArrIdx;
-                        // Print or process the parsed instruction and operands
-//                    printf("Instruction: %s, Operand1: %s, Operand2: %s\n", instruction, operand1, operand2);
+                        // Print or process the parsed instruction and secondOperands
+//                    printf("Instruction: %s, Operand1: %s, Operand2: %s\n", instruction, secondOperand1, secondOperand2);
                     } else {
                         printf("Error: Invalid format in line\n");
                     }
@@ -122,31 +122,65 @@ unsigned char decodeOperation(const char *opcode) {
     }
 }
 
-decode
+unsigned char decodeFirstOperand(const char *firstOperand) {
+    int number = atoi(firstOperand + 1);
+    if (number > 63) {
+        fprintf(stderr, "Error:Register R%d Doesn't exist.\n" , number);
+        exit(EXIT_FAILURE);
+    }
+    return (unsigned char)(number & 0x3F); // Mask the number to fit within 6 bits
+}
+
+unsigned char encodeImmediate(const char *value) {
+    int number = atoi(value + 1); // Skip the '#' character
+    if (number > 63) {
+        fprintf(stderr, "Error: Immediate value out of range.\n");
+        exit(EXIT_FAILURE);
+    }
+    return (unsigned char)(number & 0x3F);
+}
+unsigned char decodeSecondOperand(const char *secondOperand) {
+    if(secondOperand[0] == 'R'){ // Register
+        return decodeFirstOperand(secondOperand) ;
+    } else if (secondOperand[0] == '#') { // Immediate value
+        return encodeImmediate(secondOperand);
+    }else if (secondOperand[0] == '(') {
+        char addressOperand[20];
+        sscanf(secondOperand, "(%[^)])", addressOperand);
+        int addressValue = atoi(addressOperand);
+        if (addressValue > 63) {
+            fprintf(stderr, "Error: Address value out of range.\n");
+            exit(EXIT_FAILURE);
+        }
+        return (unsigned char)(addressValue & 0x3F);
+    }else {
+        fprintf(stderr, "Error: Invalid secondOperand format.\n");
+        exit(EXIT_FAILURE);
+    }
+}
 
 uint16_t decodeOneInstruction(Instruction i){
     unsigned char opcode =decodeOperation(i.operation); // 4 bits
-    decodeFirstOperand(i.firstOp); // 6 bits
-
-    decodeSecoundOperand(i.secondOp); // 6 bits
+    unsigned char firstOpr = decodeFirstOperand(i.firstOp); // 6 bits
+    unsigned char secondOpr = decodeSecondOperand(i.secondOp); // 6 bits
+    uint16_t instruction = 0;
+    instruction |= (opcode & 0x0F) << 12;     // Shift opcode to the most significant bits
+    instruction |= (firstOpr & 0x3F) << 6;    // Shift first operand into position
+    instruction |= (secondOpr & 0x3F);         // Include second operand as it is
+    return instruction;
 }
 
+/**
+ *  get instructions from instructions array  -> in instruction.h
+ based on the fields will decode its binary values  ex: ADD 0000 , R0 , R1
+ note : each instruction should be decoded to 16 bit
+ save each 16 bit instruction (one word in IM)in the Instruction Memory
+ */
 
-// get instructions from instructions array  -> in instruction.h
-// based on the fields will decode its binary values  ex: ADD 0000 , R0 , R1
-// note : each instruction should be decoded to 16 bit
-// save each 16 bit instruction (one word in IM)in the Instruction Memory
-uint16_t decodeInstruction() {
-    InstructionsArr *Instructions = ReadAssemblyTextFile() ;
-
-}
-
-char InstructionFormat (char opcode[]){
-
-InstructionMemory* DecodeAllInstructions(InstructionsArr instArray , InstructionMemory * mem){
-    int length = sizeof(instArray.Instructions) / sizeof(instArray.Instructions[0]);
+InstructionMemory* DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem){
+    int length = sizeof(instArray->Instructions) / sizeof(instArray->Instructions[0]);
     for (int i = 0; i < length; ++i) {
-        IMWrite(mem, i,decodeOneInstruction(instArray.Instructions[i]))  ;
+        IMWrite(mem, i,decodeOneInstruction(instArray->Instructions[i]))  ;
     }
 }
 
