@@ -10,8 +10,8 @@
 
 typedef struct {
     char operation[4] ;
-    char firstOp[6] ;
-    char secondOp[6] ;
+    char firstOp[3] ; // Reg
+    char secondOp[6] ; // Reg or IMM or Address
 }Instruction;
 
 
@@ -31,3 +31,33 @@ void InstructionArrPrint (InstructionsArr* Arr){
         printf("operation: %s  ,first operand: %s,second operand %s \n" ,I.operation,I.firstOp,I.secondOp) ;
     }
 }
+
+//void decode(Instruction* i , ){
+//    switch (i->operation) {
+//        case "ADD":
+//
+//            break;
+//        case "SUB":
+//            break;
+//        case "MUL":
+//            break;
+//        case "LDI":
+//            break;
+//        case "BEQZ":
+//            break;
+//        case "AND":
+//            break;
+//        case "OR":
+//            break;
+//        case "JR":
+//            break;
+//        case "SLC":
+//            break;
+//        case "SRC":
+//            break;
+//        case "LB":
+//            break;
+//        case "SB":
+//            break;
+//    }
+//}

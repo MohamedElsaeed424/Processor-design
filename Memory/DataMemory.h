@@ -2,17 +2,18 @@
 #define PROCESSOR_DESIGN_DATAMEMORY_H
 
 #include <stdio.h>
+#include <stdint.h>
 #define WORD_SIZE 8
 #define DATA_MEM_SIZE 2024
 
-typedef struct  Word {
-    uint8_t size ;
-};
+//typedef struct {
+//    uint8_t size ;
+//}Word;
 
 // Array of words
-typedef struct DataMemory {
-    Word Dmemory[DATA_MEM_SIZE];
-};
+typedef struct  {
+    uint8_t Dmemory[DATA_MEM_SIZE];
+}DataMemory;
 
 /**
  * Initializing DM with values

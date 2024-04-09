@@ -1,12 +1,12 @@
-//
-// Created by Mahmoud on 4/9/2024.
-//
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <string.h>
+
 #include "Instructions/Instruction.h"
+#include "Memory/InstructionMemory.h"
 #define MAX_LINE_LENGTH 100
 #define INSTRUCTION_SIZE_IN_BYTES 18
 
@@ -78,7 +78,62 @@ InstructionsArr* ReadAssemblyTextFile (){
     return IArr ;
 }
 
-uint16_t decodeInstruction (){
 
+// Function to decode operation opcode to 4-bit value
+unsigned char decodeOperation(const char *opcode) {
+    if (strcmp(opcode, "ADD") == 0) {
+        return 0b0000;
+    } else if (strcmp(opcode, "SUB") == 0) {
+        return 0b0001;
+    } else if (strcmp(opcode, "MUL") == 0) {
+        return 0b0010;
+    } else if (strcmp(opcode, "LDI") == 0) {
+        return 0b0011;
+    } else if (strcmp(opcode, "BEQZ") == 0) {
+        return 0b0100;
+    } else if (strcmp(opcode, "AND") == 0) {
+        return 0b0101;
+    } else if (strcmp(opcode, "OR") == 0) {
+        return 0b0110;
+    } else if (strcmp(opcode, "JR") == 0) {
+        return 0b0111;
+    } else if (strcmp(opcode, "SLC") == 0) {
+        return 0b1000;
+    } else if (strcmp(opcode, "SRC") == 0) {
+        return 0b1001;
+    } else if (strcmp(opcode, "LB") == 0) {
+        return 0b1010;
+    } else if (strcmp(opcode, "SB") == 0) {
+        return 0b1011;
+    } else {
+        printf("This Opcode not exist in out ISA");
+        return 0xFF; // 0xFF as an error value
+    }
 }
+
+decode
+
+uint16_t decodeOneInstruction(Instruction i){
+    unsigned char opcode =decodeOperation(i.operation); // 4 bits
+    decodeFirstOperand(i.firstOp); // 6 bits
+
+    decodeSecoundOperand(i.secondOp); // 6 bits
+}
+
+
+// get instructions from instructions array  -> in instruction.h
+// based on the fields will decode its binary values  ex: ADD 0000 , R0 , R1
+// note : each instruction should be decoded to 16 bit
+// save each 16 bit instruction (one word in IM)in the Instruction Memory
+
+InstructionMemory* DecodeAllInstructions(InstructionsArr instArray , InstructionMemory * mem){
+    int length = sizeof(instArray.Instructions) / sizeof(instArray.Instructions[0]);
+    for (int i = 0; i < length; ++i) {
+        IMWrite(mem, i,decodeOneInstruction(instArray.Instructions[i]))  ;
+    }
+}
+
+
+
+
 

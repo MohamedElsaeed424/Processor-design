@@ -5,14 +5,14 @@
 #define WORD_SIZE 16
 #define INSTRUCTION_MEM_SIZE 1024
 
-typedef struct Word {
-    uint16_t size ;
-};
+//typedef struct  {
+//    uint16_t size ;
+//} Word;
 
 // Array of words
-typedef struct InstructionMemory {
-    Word Imemory[INSTRUCTION_MEM_SIZE];
-};
+typedef struct  {
+    uint16_t Imemory[INSTRUCTION_MEM_SIZE];
+} InstructionMemory ;
 
 /**
  * Initializing IM with values
@@ -20,7 +20,7 @@ typedef struct InstructionMemory {
  */
 void IMInit(InstructionMemory *mem){
     for (int i = 0; i < INSTRUCTION_MEM_SIZE ; ++i) {
-        mem->Imemory[i] = 0 ;
+        mem->Imemory[i] = (uint16_t)0 ;
     }
 }
 
