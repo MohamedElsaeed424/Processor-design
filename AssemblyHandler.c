@@ -17,7 +17,7 @@
  * and secondOperands to array of instruction
  * @return
  */
-InstructionsArr *ReadAssemblyTextFile() {
+InstructionsArr* ReadAssemblyTextFile() {
     char fileName[] = "E:\\Processor-design\\AssemblyProgramm.txt";
     FILE *file = fopen(fileName, "r");
     if (file == NULL) {
@@ -131,7 +131,7 @@ unsigned char decodeFirstOperand(const char *firstOperand) {
     return (unsigned char)(number & 0x3F); // Mask the number to fit within 6 bits
 }
 
-unsigned char encodeImmediate(const char *value) {
+unsigned char decodeImmediate(const char *value) {
     int number = atoi(value + 1); // Skip the '#' character
     if (number > 63) {
         fprintf(stderr, "Error: Immediate value out of range.\n");
@@ -143,7 +143,7 @@ unsigned char decodeSecondOperand(const char *secondOperand) {
     if(secondOperand[0] == 'R'){ // Register
         return decodeFirstOperand(secondOperand) ;
     } else if (secondOperand[0] == '#') { // Immediate value
-        return encodeImmediate(secondOperand);
+        return decodeImmediate(secondOperand);
     }else if (secondOperand[0] == '(') {
         char addressOperand[20];
         sscanf(secondOperand, "(%[^)])", addressOperand);
@@ -170,18 +170,20 @@ uint16_t decodeOneInstruction(Instruction i){
     return instruction;
 }
 
-/**
- *  get instructions from instructions array  -> in instruction.h
- based on the fields will decode its binary values  ex: ADD 0000 , R0 , R1
- note : each instruction should be decoded to 16 bit
- save each 16 bit instruction (one word in IM)in the Instruction Memory
- */
 
 InstructionMemory* DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem){
     int length = sizeof(instArray->Instructions) / sizeof(instArray->Instructions[0]);
     for (int i = 0; i < length; ++i) {
         IMWrite(mem, i,decodeOneInstruction(instArray->Instructions[i]))  ;
     }
+}
+
+int main(){
+
+    InstructionsArr *arr = ReadAssemblyTextFile();
+//    DecodeAllInstructions(arr , )
+
+    return 0 ;
 }
 
 
