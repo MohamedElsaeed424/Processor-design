@@ -1,14 +1,16 @@
 #ifndef PROCESSOR_DESIGN_STATUSREGISTER_H
 #define PROCESSOR_DESIGN_STATUSREGISTER_H
+#include <stdio.h>
+#include <stdint.h>
 
-typedef struct SREG {
+typedef struct  {
     unsigned char flags; // to represent all flags in one byte
     static const unsigned char C_FLAG = 0b00000001; // Carry Flag
     static const unsigned char V_FLAG = 0b00000010; // Two's Complement Overflow Flag
     static const unsigned char N_FLAG = 0b00000100; // Negative Flag
     static const unsigned char S_FLAG = 0b00001000; // Sign Flag
     static const unsigned char Z_FLAG = 0b00010000; // Zero Flag
-};
+}SREG;
 
 /**
  * Initialize Status Register

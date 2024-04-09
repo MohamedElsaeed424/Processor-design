@@ -1,6 +1,5 @@
 #ifndef PROCESSOR_DESIGN_DATAMEMORY_H
 #define PROCESSOR_DESIGN_DATAMEMORY_H
-#include <stdint.h>
 #include <stdio.h>
 #include <stdint.h>
 #define WORD_SIZE 8
