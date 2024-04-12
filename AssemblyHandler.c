@@ -83,7 +83,7 @@ InstructionsArr* ReadAssemblyTextFile() {
         int numberOfBytesNeeded = (int) ceil(log2(numberOfInstructions) / 8);
 //    printf("%i" ,numberOfBytesNeeded) ;
 //    InstructionsArr * tmp = calloc()
-        IArr = realloc(IArr, INSTRUCTION_SIZE_IN_BYTES * numberOfBytesNeeded);
+//        IArr = realloc(IArr, INSTRUCTION_SIZE_IN_BYTES * numberOfBytesNeeded);
         fclose(file);
         return IArr;
     }
@@ -91,7 +91,8 @@ InstructionsArr* ReadAssemblyTextFile() {
 
 
 // Function to decode operation opcode to 4-bit value
-unsigned char decodeOperation(const char *opcode) {
+unsigned char decodeOperation(char *opcode) {
+
     if (strcmp(opcode, "ADD") == 0) {
         return 0b0000;
     } else if (strcmp(opcode, "SUB") == 0) {
@@ -161,6 +162,8 @@ unsigned char decodeSecondOperand(const char *secondOperand) {
 
 uint16_t decodeOneInstruction(Instruction i){
     unsigned char opcode =decodeOperation(i.operation); // 4 bits
+    printf("%i\n",opcode) ;
+    printf("%s\n",i.operation) ;
     unsigned char firstOpr = decodeFirstOperand(i.firstOp); // 6 bits
     unsigned char secondOpr = decodeSecondOperand(i.secondOp); // 6 bits
     uint16_t instruction = 0;
@@ -178,12 +181,16 @@ InstructionMemory* DecodeAllInstructions(InstructionsArr* instArray , Instructio
     }
 }
 
+
 int main(){
-
-    InstructionsArr *arr = ReadAssemblyTextFile();
-//    DecodeAllInstructions(arr , )
-
-    return 0 ;
+    InstructionsArr* IArr ;
+    IArr = ReadAssemblyTextFile() ;
+    InstructionMemory* IMem = malloc(36) ;
+    IMInit(IMem) ;
+//    DecodeAllInstructions(IArr,IMem) ;
+//    IMPrint(IMem) ;
+//    InstructionArrPrint(IArr) ;
+    free(IArr) ;
 }
 
 

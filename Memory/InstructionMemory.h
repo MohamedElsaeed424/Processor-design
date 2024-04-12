@@ -52,5 +52,11 @@ void IMWrite(InstructionMemory *mem, uint16_t address, uint16_t data){
     mem->Imemory[address] = data ;
 }
 
+void IMPrint(InstructionMemory *mem){
+    for (int i = 0; i < INSTRUCTION_MEM_SIZE; ++i) {
+        printf("%hu",mem->Imemory[i]) ;
+    }
+}
+
 
 #endif //PROCESSOR_DESIGN_INSTRUCTIONMEMORY_H
