@@ -26,7 +26,6 @@ void ReadAssemblyTextFile(InstructionsArr **IArr) {
     if (file == NULL) {
         perror("Error opening file");
         *IArr = NULL;
-
     }
     int instructionsArrIdx = 0;
     //allocating the memory size to be max size of instruction which is 18 byte
@@ -34,7 +33,7 @@ void ReadAssemblyTextFile(InstructionsArr **IArr) {
     *IArr = calloc(1024, INSTRUCTION_SIZE_IN_BYTES);
 
     char line[MAX_LINE_LENGTH];
-    if (IArr == NULL) {
+    if (*IArr == NULL) {
         printf("Memory allocation failure");
         IArr = NULL;
     } else {
@@ -67,7 +66,7 @@ void ReadAssemblyTextFile(InstructionsArr **IArr) {
                         strcpy(I.firstOp, secondOperand1);
                         strcpy(I.secondOp, secondOperand2);
 //                    printf("%s %s %s \n" ,I.operation, I.firstOp ,I.secondOp ) ;
-                        InstructionArrWrite(IArr, I, instructionsArrIdx);
+                        InstructionArrWrite(*IArr, I, instructionsArrIdx);
                         ++instructionsArrIdx;
                         // Print or process the parsed instruction and secondOperands
 //                    printf("Instruction: %s, Operand1: %s, Operand2: %s\n", instruction, secondOperand1, secondOperand2);
@@ -83,11 +82,6 @@ void ReadAssemblyTextFile(InstructionsArr **IArr) {
         }
         int numberOfInstructions = instructionsArrIdx + 1;
         numOfInstructions = numberOfInstructions ;
-        //getting number of bytes needed to store all instructions
-//        int numberOfBytesNeeded = (int) ceil(log2(numberOfInstructions) / 8);
-//    printf("%i" ,numberOfBytesNeeded) ;
-//    InstructionsArr * tmp = calloc()
-//        IArr = realloc(IArr, INSTRUCTION_SIZE_IN_BYTES * numberOfBytesNeeded);
         fclose(file);
     }
 }
@@ -121,7 +115,7 @@ unsigned char decodeOperation(char *opcode) {
     } else if (strcmp(opcode, "SB") == 0) {
         return 0b1011;
     } else {
-        printf("This Opcode not exist in out ISA");
+        printf("This Opcode not exist in out ISA\n");
         return 0xFF; // 0xFF as an error value
     }
 }
@@ -188,11 +182,9 @@ InstructionMemory* DecodeAllInstructions(InstructionsArr* instArray , Instructio
 int main(){
     InstructionsArr* IArr ;
     InstructionMemory * Imem ;
-    IArr = ReadAssemblyTextFile() ;
+    ReadAssemblyTextFile(&IArr) ;
     IMInit(&Imem) ;
     DecodeAllInstructions(IArr,Imem) ;
-//    IMPrint(Imem) ;
-//    InstructionArrPrint(IArr) ;
     free(IArr) ;
     free(Imem) ;
 }
