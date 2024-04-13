@@ -52,7 +52,7 @@ void IMWrite(InstructionMemory *mem, uint16_t address, uint16_t data){
 
 void IMPrint(InstructionMemory *mem){
     for (int i = 0; i < INSTRUCTION_MEM_SIZE; ++i) {
-        printf("%hu",mem->Imemory[i]) ;
+        printf("%hu\n",mem->Imemory[i]) ;
     }
 }
 

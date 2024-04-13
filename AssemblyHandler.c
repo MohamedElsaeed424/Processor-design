@@ -185,6 +185,7 @@ int main(){
     ReadAssemblyTextFile(&IArr) ;
     IMInit(&Imem) ;
     DecodeAllInstructions(IArr,Imem) ;
+    IMPrint(Imem);
     free(IArr) ;
     free(Imem) ;
 }
