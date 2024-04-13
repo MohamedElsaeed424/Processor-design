@@ -165,7 +165,7 @@ unsigned char decodeSecondOperand(const char *secondOperand) {
     }
 }
 
-uint16_t decodeOneInstruction(Instruction i){
+uint16_t decodeOneInstruction(Instruction  i){
     unsigned char opcode =decodeOperation(i.operation); // 4 bits
     printf("%i\n",opcode) ;
     printf("%s\n",i.operation) ;
@@ -179,10 +179,10 @@ uint16_t decodeOneInstruction(Instruction i){
 }
 
 
-InstructionMemory* DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem){
+void  DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem){
     int length = sizeof(instArray->Instructions) / sizeof(instArray->Instructions[0]);
     for (int i = 0; i < numOfInstructions-1; ++i) {
-        IMWrite(mem, i,decodeOneInstruction(instArray->Instructions[i]))  ;
+        IMWrite(mem, i,decodeOneInstruction((instArray->Instructions[i])))  ;
     }
 }
 
@@ -190,14 +190,13 @@ InstructionMemory* DecodeAllInstructions(InstructionsArr* instArray , Instructio
 int main(){
     InstructionsArr* IArr ;
     InstructionMemory * Imem ;
-    DataMemory* Dmem ;
-    IMInit(Imem) ;
-    DMInit(Dmem);
     IArr = ReadAssemblyTextFile() ;
+    IMInit(&Imem) ;
     DecodeAllInstructions(IArr,Imem) ;
 //    IMPrint(Imem) ;
 //    InstructionArrPrint(IArr) ;
     free(IArr) ;
+    free(Imem) ;
 }
 
 
