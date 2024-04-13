@@ -19,7 +19,7 @@ typedef struct  {
  * @param mem : refrence to the DM
  */
 void DMInit(DataMemory *mem){
-    DataMemory *DMem = calloc( DATA_MEM_SIZE,1) ;
+    mem = calloc( DATA_MEM_SIZE,1) ;
 }
 /**
  * Reading from DM

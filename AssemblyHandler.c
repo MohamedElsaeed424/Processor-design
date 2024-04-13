@@ -19,7 +19,7 @@
  * @return
  */
 InstructionsArr* ReadAssemblyTextFile() {
-    char fileName[] = "E:\\Processor-design\\AssemblyProgramm.txt";
+    char fileName[] = "AssemblyProgramm.txt";
     FILE *file = fopen(fileName, "r");
     if (file == NULL) {
         perror("Error opening file");
@@ -190,7 +190,7 @@ int main(){
     IMInit(Imem) ;
     DMInit(Dmem);
     IArr = ReadAssemblyTextFile() ;
-//    DecodeAllInstructions(IArr,Imem) ;
+    DecodeAllInstructions(IArr,Imem) ;
 //    IMPrint(Imem) ;
     InstructionArrPrint(IArr) ;
     free(IArr) ;

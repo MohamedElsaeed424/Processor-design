@@ -19,7 +19,7 @@ typedef struct  {
  * @param mem : refrence to the IM
  */
 void IMInit(InstructionMemory *mem){
-    InstructionMemory* IMem = calloc( INSTRUCTION_MEM_SIZE,2) ;
+    mem = calloc( INSTRUCTION_MEM_SIZE,2) ;
 }
 
 /**
