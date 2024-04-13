@@ -190,10 +190,9 @@ int main(){
     IMInit(Imem) ;
     DMInit(Dmem);
     IArr = ReadAssemblyTextFile() ;
-
-//    DecodeAllInstructions(IArr,IMem) ;
-//    IMPrint(IMem) ;
-//    InstructionArrPrint(IArr) ;
+//    DecodeAllInstructions(IArr,Imem) ;
+//    IMPrint(Imem) ;
+    InstructionArrPrint(IArr) ;
     free(IArr) ;
 }
 
