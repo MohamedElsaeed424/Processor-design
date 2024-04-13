@@ -1,5 +1,21 @@
-/home/adduser/.cache/JetBrains/RemoteDev/dist/3d8b36b2566c3_CLion-241.14494.229/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/adduser/.cache/JetBrains/RemoteDev/dist/3d8b36b2566c3_CLion-241.14494.229/bin/ninja/linux/x64/ninja -G Ninja -S /mnt/d/Coding/C_Programing/Processor-design -B /mnt/d/Coding/C_Programing/Processor-design/cmake-build-debug
--- Configuring done (0.0s)
+/snap/clion/274/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" -S /home/mahmoud/CLionProjects/Processor-design -B /home/mahmoud/CLionProjects/Processor-design/cmake-build-debug
+CMake Deprecation Warning:
+  Support for "Extra Generators" like
+
+    CodeBlocks
+
+  is deprecated and will be removed from a future version of CMake.  IDEs may
+  use the cmake-file-api(7) to view CMake-generated project build trees.
+
+
+-- The C compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done (0.2s)
+CMake Error: Cannot determine link language for target "Processor-design".
 CMake Error: CMake can not determine linker language for target: Processor-design
 -- Generating done (0.0s)
 CMake Generate step failed.  Build files cannot be regenerated correctly.

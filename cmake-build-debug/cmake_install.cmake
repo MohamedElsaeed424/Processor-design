@@ -1,4 +1,4 @@
-# Install script for directory: /mnt/d/Coding/C_Programing/Processor-design
+# Install script for directory: /home/mahmoud/CLionProjects/Processor-design
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/mnt/d/Coding/C_Programing/Processor-design/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/mahmoud/CLionProjects/Processor-design/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
