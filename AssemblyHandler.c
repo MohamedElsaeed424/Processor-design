@@ -20,23 +20,23 @@ int numOfInstructions = 0  ;
  * and secondOperands to array of instruction
  * @return
  */
-InstructionsArr*ReadAssemblyTextFile() {
+void ReadAssemblyTextFile(InstructionsArr **IArr) {
     char fileName[] = "AssemblyProgramm.txt";
     FILE *file = fopen(fileName, "r");
     if (file == NULL) {
         perror("Error opening file");
-        return NULL;
-    }
+        *IArr = NULL;
 
+    }
     int instructionsArrIdx = 0;
     //allocating the memory size to be max size of instruction which is 18 byte
     //and the maximum number of instructions which is 10 bits approx 2 bytes
-    InstructionsArr* IArr = calloc(1024, INSTRUCTION_SIZE_IN_BYTES);
+    *IArr = calloc(1024, INSTRUCTION_SIZE_IN_BYTES);
 
     char line[MAX_LINE_LENGTH];
     if (IArr == NULL) {
         printf("Memory allocation failure");
-        return 0;
+        IArr = NULL;
     } else {
         // Read lines from the file until EOF is reached
         while (fgets(line, MAX_LINE_LENGTH, file) != NULL) {
@@ -88,10 +88,8 @@ InstructionsArr*ReadAssemblyTextFile() {
 //    printf("%i" ,numberOfBytesNeeded) ;
 //    InstructionsArr * tmp = calloc()
 //        IArr = realloc(IArr, INSTRUCTION_SIZE_IN_BYTES * numberOfBytesNeeded);
-
         fclose(file);
     }
-    return IArr;
 }
 
 
@@ -165,7 +163,7 @@ unsigned char decodeSecondOperand(const char *secondOperand) {
     }
 }
 
-uint16_t decodeOneInstruction(Instruction  i){
+uint16_t decodeOneInstruction(Instruction i){
     unsigned char opcode =decodeOperation(i.operation); // 4 bits
     printf("%i\n",opcode) ;
     printf("%s\n",i.operation) ;
@@ -179,10 +177,10 @@ uint16_t decodeOneInstruction(Instruction  i){
 }
 
 
-void  DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem){
+InstructionMemory* DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem){
     int length = sizeof(instArray->Instructions) / sizeof(instArray->Instructions[0]);
     for (int i = 0; i < numOfInstructions-1; ++i) {
-        IMWrite(mem, i,decodeOneInstruction((instArray->Instructions[i])))  ;
+        IMWrite(mem, i,decodeOneInstruction(instArray->Instructions[i]))  ;
     }
 }
 
