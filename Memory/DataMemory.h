@@ -2,7 +2,7 @@
 #define PROCESSOR_DESIGN_DATAMEMORY_H
 #include <stdio.h>
 #include <stdint.h>
-#define WORD_SIZE 8
+//#define WORD_SIZE 8
 #define DATA_MEM_SIZE 2024
 
 //typedef struct {
@@ -19,9 +19,7 @@ typedef struct  {
  * @param mem : refrence to the DM
  */
 void DMInit(DataMemory *mem){
-    for (int i = 0; i < DATA_MEM_SIZE ; ++i) {
-        mem->Dmemory[i] = 0 ;
-    }
+    DataMemory *DMem = calloc( DATA_MEM_SIZE,1) ;
 }
 /**
  * Reading from DM

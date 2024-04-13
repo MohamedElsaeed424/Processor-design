@@ -7,6 +7,7 @@
 
 #include "Instructions/Instruction.h"
 #include "Memory/InstructionMemory.h"
+#include "Memory/DataMemory.h"
 
 #define MAX_LINE_LENGTH 100
 #define INSTRUCTION_SIZE_IN_BYTES 18
@@ -184,9 +185,12 @@ InstructionMemory* DecodeAllInstructions(InstructionsArr* instArray , Instructio
 
 int main(){
     InstructionsArr* IArr ;
+    InstructionMemory * Imem ;
+    DataMemory* Dmem ;
+    IMInit(Imem) ;
+    DMInit(Dmem);
     IArr = ReadAssemblyTextFile() ;
-    InstructionMemory* IMem = malloc(36) ;
-    IMInit(IMem) ;
+
 //    DecodeAllInstructions(IArr,IMem) ;
 //    IMPrint(IMem) ;
 //    InstructionArrPrint(IArr) ;

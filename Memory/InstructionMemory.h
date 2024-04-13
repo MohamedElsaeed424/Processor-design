@@ -2,7 +2,7 @@
 #define PROCESSOR_DESIGN_INSTRUCTIONMEMORY_H
 #include <stdint.h>
 #include <stdio.h>
-#define WORD_SIZE 16
+//#define WORD_SIZE 16
 #define INSTRUCTION_MEM_SIZE 1024
 
 //typedef struct  {
@@ -19,9 +19,7 @@ typedef struct  {
  * @param mem : refrence to the IM
  */
 void IMInit(InstructionMemory *mem){
-    for (int i = 0; i < INSTRUCTION_MEM_SIZE ; ++i) {
-        mem->Imemory[i] = (uint16_t)0 ;
-    }
+    InstructionMemory* IMem = calloc( INSTRUCTION_MEM_SIZE,2) ;
 }
 
 /**
