@@ -13,12 +13,14 @@
 #define INSTRUCTION_SIZE_IN_BYTES 18
 
 
+int numOfInstructions = 0  ;
+
 /**
  * Reading from assembly text file and store all instructions
  * and secondOperands to array of instruction
  * @return
  */
-InstructionsArr* ReadAssemblyTextFile() {
+InstructionsArr*ReadAssemblyTextFile() {
     char fileName[] = "AssemblyProgramm.txt";
     FILE *file = fopen(fileName, "r");
     if (file == NULL) {
@@ -29,12 +31,12 @@ InstructionsArr* ReadAssemblyTextFile() {
     int instructionsArrIdx = 0;
     //allocating the memory size to be max size of instruction which is 18 byte
     //and the maximum number of instructions which is 10 bits approx 2 bytes
-    InstructionsArr *IArr = calloc(1024, INSTRUCTION_SIZE_IN_BYTES);
+    InstructionsArr* IArr = calloc(1024, INSTRUCTION_SIZE_IN_BYTES);
 
     char line[MAX_LINE_LENGTH];
     if (IArr == NULL) {
         printf("Memory allocation failure");
-        return NULL;
+        return 0;
     } else {
         // Read lines from the file until EOF is reached
         while (fgets(line, MAX_LINE_LENGTH, file) != NULL) {
@@ -80,14 +82,16 @@ InstructionsArr* ReadAssemblyTextFile() {
             }
         }
         int numberOfInstructions = instructionsArrIdx + 1;
+        numOfInstructions = numberOfInstructions ;
         //getting number of bytes needed to store all instructions
-        int numberOfBytesNeeded = (int) ceil(log2(numberOfInstructions) / 8);
+//        int numberOfBytesNeeded = (int) ceil(log2(numberOfInstructions) / 8);
 //    printf("%i" ,numberOfBytesNeeded) ;
 //    InstructionsArr * tmp = calloc()
 //        IArr = realloc(IArr, INSTRUCTION_SIZE_IN_BYTES * numberOfBytesNeeded);
+
         fclose(file);
-        return IArr;
     }
+    return IArr;
 }
 
 
@@ -177,7 +181,7 @@ uint16_t decodeOneInstruction(Instruction i){
 
 InstructionMemory* DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem){
     int length = sizeof(instArray->Instructions) / sizeof(instArray->Instructions[0]);
-    for (int i = 0; i < length; ++i) {
+    for (int i = 0; i < numOfInstructions-1; ++i) {
         IMWrite(mem, i,decodeOneInstruction(instArray->Instructions[i]))  ;
     }
 }
@@ -192,7 +196,7 @@ int main(){
     IArr = ReadAssemblyTextFile() ;
     DecodeAllInstructions(IArr,Imem) ;
 //    IMPrint(Imem) ;
-    InstructionArrPrint(IArr) ;
+//    InstructionArrPrint(IArr) ;
     free(IArr) ;
 }
 
