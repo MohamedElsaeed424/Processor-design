@@ -21,8 +21,8 @@ typedef struct {
 
 
 
-void InstructionArrWrite(InstructionsArr* Arr , Instruction I , uint16_t addres ) {
-    Arr->Instructions[addres] = I ;
+void InstructionArrWrite(InstructionsArr* Arr , Instruction I , uint16_t address ) {
+    Arr->Instructions[address] = I ;
 };
 
 void InstructionArrPrint (InstructionsArr* Arr){

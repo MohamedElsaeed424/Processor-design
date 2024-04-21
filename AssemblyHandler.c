@@ -12,6 +12,7 @@
 
 #define MAX_LINE_LENGTH 100
 #define INSTRUCTION_SIZE_IN_BYTES 18
+#define MAX_LINE_SIZE 17
 
 
 int numOfInstructions = 0  ;
@@ -22,7 +23,7 @@ int numOfInstructions = 0  ;
  * @return
  */
 void ReadAssemblyTextFile(InstructionsArr **IArr) {
-    char fileName[] = "AssemblyProgramm.txt";
+    char fileName[] = "AssemblyProgram.txt";
     FILE *file = fopen(fileName, "r");
     if (file == NULL) {
         perror("Error opening file");
@@ -31,7 +32,7 @@ void ReadAssemblyTextFile(InstructionsArr **IArr) {
     int instructionsArrIdx = 0;
     //allocating the memory size to be max size of instruction which is 18 byte
     //and the maximum number of instructions which is 10 bits approx 2 bytes
-    *IArr = calloc(1024, INSTRUCTION_SIZE_IN_BYTES);
+    *IArr = calloc(1, sizeof(InstructionsArr));
 
     char line[MAX_LINE_LENGTH];
     if (*IArr == NULL) {
@@ -192,17 +193,55 @@ void Execute(InstructionMemory * Imem, DataMemory *Dmem, GPRs *gpr ){
     //      for the 4 bits . do the operation based on these 4 bits  0000 -> +
     //
 }
+int countLines(FILE* in){
+    int lines = 0;
+    int startedLine = 0; // boolean
+    int c;
+
+    while((c= fgetc(in)) != EOF){
+        if(c != '\n')
+            startedLine = 1;
+        else if (startedLine){
+            ++lines;
+            startedLine = 0;
+        }
+    }
+    rewind(in);
+    if(startedLine)
+        ++lines;
+    return lines;
+}
+void betterRead(){
+    FILE* file = fopen("AssemblyProgram.txt", "r");
+    if(!file){
+        printf("Failed to open file\n");
+        return;
+    }
+    char line[MAX_LINE_SIZE];
+    int i = 1;
+    while(fgets(line, MAX_LINE_SIZE, file) != NULL){
+        if(line[strlen(line)-1] == '\n')
+            line[strlen(line)-1] = '\0';
+        // decode line and put straight into Instruction memory
+        // do not store in another array then decode
+        printf("%i- %llu: %s\n",i, strlen(line), line);
+        ++i;
+    }
+    fclose(file);
+}
 
 
 int main(){
-    InstructionsArr* IArr ;
-    InstructionMemory * Imem ;
-    ReadAssemblyTextFile(&IArr) ;
-    IMInit(&Imem) ;
-    DecodeAllInstructions(IArr,Imem) ;
-    IMPrint(Imem);
-    free(IArr) ;
-    free(Imem) ;
+//    InstructionsArr* IArr ;
+//    InstructionMemory * Imem ;
+//    ReadAssemblyTextFile(&IArr) ;
+//    IMInit(&Imem) ;
+//    DecodeAllInstructions(IArr,Imem) ;
+//    IMPrint(Imem);
+//    free(IArr) ;
+//    free(Imem) ;
+    betterRead();
+    return 0;
 }
 
 
