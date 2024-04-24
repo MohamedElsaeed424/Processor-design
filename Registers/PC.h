@@ -17,6 +17,9 @@ typedef struct {
 void storeNextInstruction(PC *pc ,uint16_t instAddress){
     pc-> address = instAddress ;
 }
+void PCInit(PC **pc){
+    *pc = calloc(1, sizeof(PC));
+}
 
 /**
  * This function used in BEQZ Instruction

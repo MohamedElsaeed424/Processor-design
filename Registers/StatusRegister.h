@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include <stdint.h>
+#include <stdlib.h>
 
 typedef struct  {
     uint8_t C : 1 ;
@@ -18,13 +18,8 @@ typedef struct  {
  * Initialize Status Register
  * @param sreg : pointer to the Status Register
  */
-void sreg_init(SREG *sreg) {
-    sreg->C = 0;
-    sreg->V = 0;
-    sreg->N = 0;
-    sreg->S = 0;
-    sreg->Z = 0;
-    sreg->rest = 0;
+void SregInit(SREG **sreg) {
+    *sreg = calloc(1, sizeof(SREG));
 }
 
 /**

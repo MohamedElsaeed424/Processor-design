@@ -31,6 +31,11 @@ void InstructionArrPrint (InstructionsArr* Arr){
         printf("operation: %s ,first operand: %s,second operand %s \n" ,I.operation,I.firstOp,I.secondOp) ;
     }
 }
+typedef struct {
+    unsigned char opcode;
+    unsigned char operand1;
+    unsigned char operand2;
+} DecodedInstruction;
 
 //void decode(Instruction* i , ){
 //    switch (i->operation) {

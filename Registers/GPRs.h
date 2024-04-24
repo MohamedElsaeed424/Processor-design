@@ -20,10 +20,8 @@ typedef struct {
  * Initializing GPRs with values
  * @param gprs : refrence to the GPRs
  */
-void GPRsInit(GPRs *gprs){
-    for (int i = 0; i < GPRS_SIZE ; ++i) {
-        gprs->GPRegisters[i] = 0 ;
-    }
+void GPRsInit(GPRs **gprs){
+    *gprs = calloc(1, sizeof(GPRs));
 }
 
 /**

@@ -9,12 +9,21 @@
 #include "Memory/InstructionMemory.h"
 #include "Memory/DataMemory.h"
 #include "Registers/GPRs.h"
+#include "Registers/PC.h"
+#include "Registers/StatusRegister.h"
 
 #define MAX_LINE_LENGTH 100
 #define INSTRUCTION_SIZE_IN_BYTES 18
-
+InstructionsArr* IArr ;
+InstructionMemory * Imem ;
+PC *pc;
+GPRs *gprs;
+DataMemory *Dmem;
+SREG *sreg;
 
 int numOfInstructions = 0  ;
+int fetched = 0 ;
+DecodedInstruction decoded;
 
 /**
  * Reading from assembly text file and store all instructions
@@ -160,14 +169,14 @@ unsigned char decodeSecondOperand(const char *secondOperand) {
 
 uint16_t decodeOneInstruction(Instruction i){
     unsigned char opcode =decodeOperation(i.operation); // 4 bits
-    printf("%i\n",opcode) ;
-    printf("%s\n",i.operation) ;
     unsigned char firstOpr = decodeFirstOperand(i.firstOp); // 6 bits
     unsigned char secondOpr = decodeSecondOperand(i.secondOp); // 6 bits
+    printf("%i\n",opcode) ;
+    printf("%s\n",i.operation) ;
     uint16_t instruction = 0;
     instruction |= (opcode & 0x0F) << 12;     // Shift opcode to the most significant bits
     instruction |= (firstOpr & 0x3F) << 6;    // Shift first operand into position
-    instruction |= (secondOpr & 0x3F);         // Include second operand as it is
+    instruction |= (secondOpr & 0x3F);        // Include second operand as it is
     return instruction;
 }
 
@@ -179,30 +188,54 @@ void DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem)
     }
 }
 
-void Execute(InstructionMemory * Imem, DataMemory *Dmem, GPRs *gpr ){
-    // read instruction from Imem
-    // for each (16 bit)
-    //      devid these 16 bit to 4 6 6 bits
-    //      We have to determine the operation cause we will do the following steps based on it
-    //      this will affect how we will retrieve the operands and where we will store our result .
-    //      for first 6 bits (first operand) note : will be always a Register
-    //          Access the gpr with these 6 bits  000001001 -> gpr.GPRegisters[9] and save the first operand in var 1
-    //      for second 6 bits note : maybe reg or memory
-    //          based on the 4 bits of the operation will determine
-    //      for the 4 bits . do the operation based on these 4 bits  0000 -> +
-    //
+/** read instruction from Imem
+// for each (16 bit)
+//      devid these 16 bit to 4 6 6 bits
+//      We have to determine the operation cause we will do the following steps based on it
+//      this will affect how we will retrieve the operands and where we will store our result .
+//      for first 6 bits (first operand) note : will be always a Register
+//          Access the gpr with these 6 bits  000001001 -> gpr.GPRegisters[9] and save the first operand in var 1
+//      for second 6 bits note : maybe reg or memory
+//          based on the 4 bits of the operation will determine
+//      for the 4 bits . do the operation based on these 4 bits  0000 -> +
+ **/
+
+//void Execute(InstructionMemory * Imem, DataMemory *Dmem, GPRs *gpr ){
+//    Imem->Imemory[currExecute] ;
+//}
+void fetch(){
+    fetched = Imem->Imemory[pc->address++];
+}
+void decode(){
+
 }
 
 
-int main(){
-    InstructionsArr* IArr ;
-    InstructionMemory * Imem ;
+void init(){
     ReadAssemblyTextFile(&IArr) ;
     IMInit(&Imem) ;
     DecodeAllInstructions(IArr,Imem) ;
-    IMPrint(Imem);
+    PCInit(&pc);
+    GPRsInit(&gprs);
+    DMInit(&Dmem);
+    SregInit(&sreg);
+
+}
+void end(){
     free(IArr) ;
     free(Imem) ;
+    free(pc) ;
+    free(gprs) ;
+    free(Dmem) ;
+    free(sreg);
+}
+int main(){
+
+    init();
+
+    IMPrint(Imem);
+
+    end();
 }
 
 
