@@ -22,8 +22,8 @@ DataMemory *Dmem;
 SREG *sreg;
 
 int numOfInstructions = 0  ;
-int fetched = 0 ;
-DecodedInstruction decoded;
+uint16_t fetched = 0 ;
+DecodedInstruction* decoded;
 
 /**
  * Reading from assembly text file and store all instructions
@@ -207,8 +207,9 @@ void fetch(){
     fetched = Imem->Imemory[pc->address++];
 }
 void decode(){
-
+    decoded = decodeInstruction(fetched);
 }
+
 
 
 void init(){
@@ -219,7 +220,7 @@ void init(){
     GPRsInit(&gprs);
     DMInit(&Dmem);
     SregInit(&sreg);
-
+    decoded = (DecodedInstruction*)calloc(1, sizeof(DecodedInstruction));
 }
 void end(){
     free(IArr) ;
@@ -228,6 +229,7 @@ void end(){
     free(gprs) ;
     free(Dmem) ;
     free(sreg);
+    free(decoded);
 }
 int main(){
 

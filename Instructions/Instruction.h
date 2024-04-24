@@ -36,6 +36,13 @@ typedef struct {
     unsigned char operand1;
     unsigned char operand2;
 } DecodedInstruction;
+DecodedInstruction *decodeInstruction(uint16_t instruction){
+    DecodedInstruction *decoded = malloc(sizeof(DecodedInstruction ));
+    decoded->opcode = (instruction >> 12) & 0x000F;
+    decoded->operand1 = (instruction >> 6) & 0x003F;
+    decoded->operand1 = instruction & 0x003F;
+    return decoded;
+}
 
 //void decode(Instruction* i , ){
 //    switch (i->operation) {
