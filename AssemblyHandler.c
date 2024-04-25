@@ -25,6 +25,23 @@ int numOfInstructions = 0  ;
 uint16_t fetched = 0 ;
 DecodedInstruction* decoded;
 
+// function prototypes
+void add(uint8_t operand1, uint8_t operand2);
+void sub(uint8_t operand1, uint8_t operand2);
+void mul(uint8_t operand1, uint8_t operand2);
+void ldi(uint8_t operand1, uint8_t imm);
+void beqz(uint8_t operand1, uint8_t imm);
+void and(uint8_t operand1, uint8_t operand2);
+void or(uint8_t operand1, uint8_t operand2);
+void jr(uint8_t operand1, uint8_t operand2);
+
+void slc(uint8_t operand1, uint8_t imm);
+void src(uint8_t operand1, uint8_t imm);
+void lb(uint8_t operand1, uint8_t address);
+void sb(uint8_t operand1, uint8_t address);
+
+void (*opFuncs[])(uint8_t, uint8_t) = { add,  sub,  mul, ldi, beqz, and, or,
+                                        jr, slc, src, lb, sb};
 /**
  * Reading from assembly text file and store all instructions
  * and secondOperands to array of instruction
@@ -209,7 +226,9 @@ void fetch(){
 void decode(){
     decoded = decodeInstruction(fetched);
 }
-
+void execute(){
+    opFuncs[decoded->opcode] (decoded->operand1, decoded->operand2);
+}
 
 
 void init(){
@@ -239,8 +258,51 @@ int main(){
 
     end();
 }
-
-
+void add(uint8_t operand1, uint8_t operand2){
+    gprs->GPRegisters[operand1] += gprs->GPRegisters[operand2];
+}
+void sub(uint8_t operand1, uint8_t operand2){
+    gprs->GPRegisters[operand1] -= gprs->GPRegisters[operand2];
+}
+void mul(uint8_t operand1, uint8_t operand2){
+    gprs->GPRegisters[operand1] *= gprs->GPRegisters[operand2];
+}
+void ldi(uint8_t operand1, uint8_t imm){
+    gprs->GPRegisters[operand1] = imm;
+}
+// odd one. Don't know what to do during pipeline
+// TODO: figure out what happens during pipeline
+void beqz(uint8_t operand1, uint8_t imm){
+    if(gprs->GPRegisters[operand1] == 0){
+        pc += 1+imm; // hmmmm 🤔
+    }
+}
+void and(uint8_t operand1, uint8_t operand2){
+    gprs->GPRegisters[operand1] &= gprs->GPRegisters[operand2];
+}
+void or(uint8_t operand1, uint8_t operand2){
+    gprs->GPRegisters[operand1] |= gprs->GPRegisters[operand2];
+}
+// odd one. Don't know what to do during pipeline
+// TODO: figure out what happens during pipeline and if R1 || R2 is bigger than 1024
+void jr(uint8_t operand1, uint8_t operand2){
+    pc->address = (gprs->GPRegisters[operand1] << 8) | gprs->GPRegisters[operand2];
+}
+void slc(uint8_t operand1, uint8_t imm){
+    gprs->GPRegisters[operand1] = (gprs->GPRegisters[imm] << imm) |
+            ((gprs->GPRegisters[imm] >> (8-imm))/* & ((1<<imm) -1)*/ );
+}
+// bit shift on unsigned type is unsigned
+void src(uint8_t operand1, uint8_t imm){
+    gprs->GPRegisters[operand1] = (gprs->GPRegisters[imm] >> imm) |
+                                  (gprs->GPRegisters[imm] << (8-imm));
+}
+void lb(uint8_t operand1, uint8_t address){
+    gprs->GPRegisters[operand1] = Dmem->Dmemory[address];
+}
+void sb(uint8_t operand1, uint8_t address){
+    Dmem->Dmemory[address] = gprs->GPRegisters[operand1];
+}
 
 
 
