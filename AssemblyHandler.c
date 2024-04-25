@@ -15,12 +15,13 @@
 #define MAX_LINE_LENGTH 100
 #define INSTRUCTION_SIZE_IN_BYTES 18
 InstructionsArr* IArr ;
-InstructionMemory * Imem ;
+InstructionMemory * Imem ; // TODO: initializing Imem with zeroes is incorrect because 0 is a valid instruction
 PC *pc;
 GPRs *gprs;
 DataMemory *Dmem;
 SREG *sreg;
 
+int clock = 0;
 int numOfInstructions = 0  ;
 uint16_t *fetched = NULL ; // TODO: make null until next instruction is fetched
 DecodedInstruction* decoded;
@@ -228,8 +229,9 @@ void decode(){
         decoded = decodeInstruction(*fetched);
 }
 void execute(){
-    if(decoded)
+    if(decoded){
         opFuncs[decoded->opcode] (decoded->operand1, decoded->operand2);
+    }
 }
 
 
@@ -254,60 +256,81 @@ void end(){
 int main(){
 
     init();
+    printf("no instructions: %i", numOfInstructions);
+    for(clock = 0; clock < 3 + numOfInstructions - 1; clock++){
+        printf("clock cycle: %d\n", clock);
+        execute();
+        decode();
+        fetch();
+    }
 
     IMPrint(Imem);
 
     end();
 }
 void add(uint8_t operand1, uint8_t operand2){
+    printf("adding R%d to R%d\n", operand2, operand1);
     gprs->GPRegisters[operand1] += gprs->GPRegisters[operand2];
 }
 void sub(uint8_t operand1, uint8_t operand2){
+    printf("subtracting R%d from R%d\n", operand2, operand1);
     gprs->GPRegisters[operand1] -= gprs->GPRegisters[operand2];
 }
 void mul(uint8_t operand1, uint8_t operand2){
+    printf("multiplying R%d to R%d\n", operand1, operand2);
     gprs->GPRegisters[operand1] *= gprs->GPRegisters[operand2];
 }
 void ldi(uint8_t operand1, uint8_t imm){
+    printf("loading value %d into R%d\n", imm, operand1);
     gprs->GPRegisters[operand1] = imm;
 }
 // odd one. Don't know what to do during pipeline
 // TODO: figure out what happens during pipeline
 void beqz(uint8_t operand1, uint8_t imm){
+    printf("checking if R%d = 0\n", operand1);
     if(gprs->GPRegisters[operand1] == 0){
+        printf("branching to %d \n", imm);
         pc += imm; // no need to add 1 because pc already incremented
         // reset fetched and decoded because they will not be executed
         fetched = NULL;
         decoded = NULL;
     }
+    printf("no branch\n");
 }
 void and(uint8_t operand1, uint8_t operand2){
+    printf("and-ing  R%d and R%d\n", operand1, operand2);
     gprs->GPRegisters[operand1] &= gprs->GPRegisters[operand2];
 }
 void or(uint8_t operand1, uint8_t operand2){
+    printf("or-ing  R%d and R%d\n", operand1, operand2);
     gprs->GPRegisters[operand1] |= gprs->GPRegisters[operand2];
 }
 // odd one. Don't know what to do during pipeline
 // TODO: figure out what happens during pipeline and if R1 || R2 is bigger than 1024
 void jr(uint8_t operand1, uint8_t operand2){
     pc->address = (gprs->GPRegisters[operand1] << 8) | gprs->GPRegisters[operand2];
+    printf("jumping to %d\n", pc->address);
     // reset fetched and decoded because they will not be executed
     fetched = NULL;
     decoded = NULL;
 }
 void slc(uint8_t operand1, uint8_t imm){
+    printf("Circular shift left R%d by %d\n", operand1, imm);
     gprs->GPRegisters[operand1] = (gprs->GPRegisters[imm] << imm) |
             ((gprs->GPRegisters[imm] >> (8-imm))/* & ((1<<imm) -1)*/ );
 }
 // bit shift on unsigned type is unsigned
 void src(uint8_t operand1, uint8_t imm){
+    printf("Circular shift right R%d by %d\n", operand1, imm);
     gprs->GPRegisters[operand1] = (gprs->GPRegisters[imm] >> imm) |
                                   (gprs->GPRegisters[imm] << (8-imm));
 }
 void lb(uint8_t operand1, uint8_t address){
+    printf("loading byte from memory address %d into R%d", address, operand1);
     gprs->GPRegisters[operand1] = Dmem->Dmemory[address];
 }
 void sb(uint8_t operand1, uint8_t address){
+    printf("storing byte from R%d into memory address %d", address, operand1);
     Dmem->Dmemory[address] = gprs->GPRegisters[operand1];
 }
 

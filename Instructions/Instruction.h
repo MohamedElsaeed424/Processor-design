@@ -40,7 +40,7 @@ DecodedInstruction *decodeInstruction(uint16_t instruction){
     DecodedInstruction *decoded = malloc(sizeof(DecodedInstruction ));
     decoded->opcode = (instruction >> 12) & 0x000F;
     decoded->operand1 = (instruction >> 6) & 0x003F;
-    decoded->operand1 = instruction & 0x003F;
+    decoded->operand2 = instruction & 0x003F;
     return decoded;
 }
 
