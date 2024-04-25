@@ -22,7 +22,7 @@ DataMemory *Dmem;
 SREG *sreg;
 
 int numOfInstructions = 0  ;
-uint16_t fetched = 0 ;
+uint16_t *fetched = NULL ; // TODO: make null until next instruction is fetched
 DecodedInstruction* decoded;
 
 // function prototypes
@@ -221,13 +221,15 @@ void DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem)
 //    Imem->Imemory[currExecute] ;
 //}
 void fetch(){
-    fetched = Imem->Imemory[pc->address++];
+    fetched = &Imem->Imemory[pc->address++];
 }
 void decode(){
-    decoded = decodeInstruction(fetched);
+    if(!fetched)
+        decoded = decodeInstruction(*fetched);
 }
 void execute(){
-    opFuncs[decoded->opcode] (decoded->operand1, decoded->operand2);
+    if(!decoded)
+        opFuncs[decoded->opcode] (decoded->operand1, decoded->operand2);
 }
 
 
@@ -239,7 +241,6 @@ void init(){
     GPRsInit(&gprs);
     DMInit(&Dmem);
     SregInit(&sreg);
-    decoded = (DecodedInstruction*)calloc(1, sizeof(DecodedInstruction));
 }
 void end(){
     free(IArr) ;
