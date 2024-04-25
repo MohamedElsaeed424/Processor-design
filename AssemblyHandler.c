@@ -224,11 +224,11 @@ void fetch(){
     fetched = &Imem->Imemory[pc->address++];
 }
 void decode(){
-    if(!fetched)
+    if(fetched)
         decoded = decodeInstruction(*fetched);
 }
 void execute(){
-    if(!decoded)
+    if(decoded)
         opFuncs[decoded->opcode] (decoded->operand1, decoded->operand2);
 }
 
@@ -275,7 +275,10 @@ void ldi(uint8_t operand1, uint8_t imm){
 // TODO: figure out what happens during pipeline
 void beqz(uint8_t operand1, uint8_t imm){
     if(gprs->GPRegisters[operand1] == 0){
-        pc += 1+imm; // hmmmm 🤔
+        pc += imm; // no need to add 1 because pc already incremented
+        // reset fetched and decoded because they will not be executed
+        fetched = NULL;
+        decoded = NULL;
     }
 }
 void and(uint8_t operand1, uint8_t operand2){
@@ -288,6 +291,9 @@ void or(uint8_t operand1, uint8_t operand2){
 // TODO: figure out what happens during pipeline and if R1 || R2 is bigger than 1024
 void jr(uint8_t operand1, uint8_t operand2){
     pc->address = (gprs->GPRegisters[operand1] << 8) | gprs->GPRegisters[operand2];
+    // reset fetched and decoded because they will not be executed
+    fetched = NULL;
+    decoded = NULL;
 }
 void slc(uint8_t operand1, uint8_t imm){
     gprs->GPRegisters[operand1] = (gprs->GPRegisters[imm] << imm) |
