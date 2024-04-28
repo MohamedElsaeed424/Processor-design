@@ -289,8 +289,8 @@ void ldi(uint8_t operand1, uint8_t imm){
 void beqz(uint8_t operand1, uint8_t imm){
     printf("checking if R%d = 0\n", operand1);
     if(gprs->GPRegisters[operand1] == 0){
-        printf("branching to %d \n", imm);
-        pc += imm; // no need to add 1 because pc already incremented
+        printf("branching to %d \n", pc->address + imm);
+        pc->address += imm; // no need to add 1 because pc already incremented
         // reset fetched and decoded because they will not be executed
         fetched = NULL;
         decoded = NULL;

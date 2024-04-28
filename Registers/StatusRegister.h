@@ -66,6 +66,13 @@ void setZ_FLAG(SREG *sreg, uint8_t value) {
     sreg->Z = value;
 }
 
+//void updateStatus(SREG *sreg, int value1, int value2, ){
+////    sreg->C =
+//    sreg
+//}
+int checkBit(int x, int i){
+    return (x & (1<<i)) != 0;
+}
 
 
 #endif //PROCESSOR_DESIGN_STATUSREGISTER_H
