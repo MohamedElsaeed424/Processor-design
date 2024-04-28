@@ -257,6 +257,7 @@ int main(){
 
     init();
     printf("no instructions: %i", numOfInstructions);
+    // TODO: figure out time with jump instructions
     for(clock = 0; clock < 3 + numOfInstructions - 1; clock++){
         printf("clock cycle: %d\n", clock);
         execute();
@@ -271,18 +272,25 @@ int main(){
 void add(uint8_t operand1, uint8_t operand2){
     printf("adding R%d to R%d\n", operand2, operand1);
     gprs->GPRegisters[operand1] += gprs->GPRegisters[operand2];
+    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 void sub(uint8_t operand1, uint8_t operand2){
     printf("subtracting R%d from R%d\n", operand2, operand1);
+    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
     gprs->GPRegisters[operand1] -= gprs->GPRegisters[operand2];
+    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 void mul(uint8_t operand1, uint8_t operand2){
     printf("multiplying R%d to R%d\n", operand1, operand2);
+    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
     gprs->GPRegisters[operand1] *= gprs->GPRegisters[operand2];
+    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 void ldi(uint8_t operand1, uint8_t imm){
+    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
     printf("loading value %d into R%d\n", imm, operand1);
     gprs->GPRegisters[operand1] = imm;
+    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 // odd one. Don't know what to do during pipeline
 // TODO: figure out what happens during pipeline
