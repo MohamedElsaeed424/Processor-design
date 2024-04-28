@@ -18,4 +18,5 @@ add_executable(
         Instructions/R_Format.h
         Registers/StatusRegister.h
         Registers/PC.h
+        playground.c
 )

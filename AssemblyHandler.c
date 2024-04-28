@@ -253,37 +253,59 @@ void end(){
     free(sreg);
     free(decoded);
 }
-int main(){
-
-    init();
-    printf("no instructions: %i", numOfInstructions);
-    // TODO: figure out time with jump instructions
-    for(clock = 0; clock < 3 + numOfInstructions - 1; clock++){
-        printf("clock cycle: %d\n", clock);
-        execute();
-        decode();
-        fetch();
-    }
-
-    IMPrint(Imem);
-
-    end();
+//int main(){
+//
+//    init();
+//    printf("no instructions: %i", numOfInstructions);
+//    // TODO: figure out time with jump instructions
+//    for(clock = 0; clock < 3 + numOfInstructions - 1; clock++){
+//        printf("clock cycle: %d\n", clock);
+//        execute();
+//        decode();
+//        fetch();
+//    }
+//
+//    IMPrint(Imem);
+//
+//    end();
+//}
+void updateNSZ(int res){
+    sreg->N = checkBit(res, 7);
+    sreg->S = sreg->N ^ sreg->V;
+    sreg->Z = res == 0;
 }
+
 void add(uint8_t operand1, uint8_t operand2){
     printf("adding R%d to R%d\n", operand2, operand1);
-    gprs->GPRegisters[operand1] += gprs->GPRegisters[operand2];
+    int result = gprs->GPRegisters[operand1] + gprs->GPRegisters[operand2];
+    int posOp1 = checkBit(gprs->GPRegisters[operand1], 7);
+    int posOp2 = checkBit(gprs->GPRegisters[operand2], 7);
+    int posRes = checkBit(result, 7);
+
+    sreg->V = posOp1 == posOp2 && posRes != posOp2;
+    sreg->C = checkBit(result, 8);
+    updateNSZ(result);
+    gprs->GPRegisters[operand1] = result;
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 void sub(uint8_t operand1, uint8_t operand2){
     printf("subtracting R%d from R%d\n", operand2, operand1);
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
-    gprs->GPRegisters[operand1] -= gprs->GPRegisters[operand2];
+    int result = gprs->GPRegisters[operand1] - gprs->GPRegisters[operand2];
+    int posOp1 = checkBit(gprs->GPRegisters[operand1], 7);
+    int posOp2 = checkBit(gprs->GPRegisters[operand2], 7);
+    int posRes = checkBit(result, 7);
+    sreg->V = posOp1 != posOp2 && posRes == posOp2 ;
+    updateNSZ(result);
+    gprs->GPRegisters[operand1] = result;
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 void mul(uint8_t operand1, uint8_t operand2){
     printf("multiplying R%d to R%d\n", operand1, operand2);
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
-    gprs->GPRegisters[operand1] *= gprs->GPRegisters[operand2];
+    int result = gprs->GPRegisters[operand1] * gprs->GPRegisters[operand2];
+    updateNSZ(result);
+    gprs->GPRegisters[operand1] = result;
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 void ldi(uint8_t operand1, uint8_t imm){
@@ -307,11 +329,15 @@ void beqz(uint8_t operand1, uint8_t imm){
 }
 void and(uint8_t operand1, uint8_t operand2){
     printf("and-ing  R%d and R%d\n", operand1, operand2);
-    gprs->GPRegisters[operand1] &= gprs->GPRegisters[operand2];
+    int result = gprs->GPRegisters[operand1] & gprs->GPRegisters[operand2];
+    updateNSZ(result);
+    gprs->GPRegisters[operand1] = result;
 }
 void or(uint8_t operand1, uint8_t operand2){
     printf("or-ing  R%d and R%d\n", operand1, operand2);
-    gprs->GPRegisters[operand1] |= gprs->GPRegisters[operand2];
+    int result = gprs->GPRegisters[operand1] | gprs->GPRegisters[operand2];
+    updateNSZ(result);
+    gprs->GPRegisters[operand1] = result;
 }
 // odd one. Don't know what to do during pipeline
 // TODO: figure out what happens during pipeline and if R1 || R2 is bigger than 1024
