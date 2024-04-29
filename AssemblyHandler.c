@@ -217,10 +217,6 @@ void DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem)
 //          based on the 4 bits of the operation will determine
 //      for the 4 bits . do the operation based on these 4 bits  0000 -> +
  **/
-
-//void Execute(InstructionMemory * Imem, DataMemory *Dmem, GPRs *gpr ){
-//    Imem->Imemory[currExecute] ;
-//}
 void fetch(){
     fetched = &Imem->Imemory[pc->address++];
 }
@@ -323,7 +319,7 @@ void beqz(uint8_t operand1, uint8_t imm){
         pc->address += imm; // no need to add 1 because pc already incremented
         // reset fetched and decoded because they will not be executed
         fetched = NULL;
-        decoded = NULL;
+        free(decoded);
     }
     printf("no branch\n");
 }
@@ -346,7 +342,7 @@ void jr(uint8_t operand1, uint8_t operand2){
     printf("jumping to %d\n", pc->address);
     // reset fetched and decoded because they will not be executed
     fetched = NULL;
-    decoded = NULL;
+    free(decoded);
 }
 void slc(uint8_t operand1, uint8_t imm){
     printf("Circular shift left R%d by %d\n", operand1, imm);

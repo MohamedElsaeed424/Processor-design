@@ -17,17 +17,15 @@ void printBits(size_t const size, void const * const ptr)
     }
     puts("");
 }
-int main(){
-    unsigned char x = 255;
-    signed char y = -1;
-    int a = (signed char) x;
-    int b = y;
-    printBits(sizeof(x), &x);
-    printBits(sizeof(y), &y);
-    printBits(sizeof(a), &a);
-    printBits(sizeof(b), &b);
+typedef struct{
+    int x;
+    int y;
+}Pair;
 
-    printf("%b %b\n", x, y);
-    printf("%d %d\n", a, b);
+int main(){
+    Pair* p = malloc(sizeof(Pair));
+    printf("%d", p);
+    free(p);
+    printf("%d", p);
     return 0;
 }

@@ -35,6 +35,7 @@ uint16_t GPRsRead(GPRs *gprs, uint8_t address){
         printf("This Address not in GPRs range of Addresses");
         return -1 ;
     }
+    printf("reading from R%d",address);
     return gprs->GPRegisters[address];
 }
 
@@ -48,11 +49,13 @@ uint16_t GPRsRead(GPRs *gprs, uint8_t address){
  */
 
 void GPRsWrite(GPRs *gprs, uint8_t address, uint8_t data){
+
     if(address >= GPRS_SIZE){
         printf("This Address not in GPRs range of Addresses");
         return ;
     }
     gprs->GPRegisters[address] = data ;
+    printf("writing %d to R%d",data, address);
 }
 
 
