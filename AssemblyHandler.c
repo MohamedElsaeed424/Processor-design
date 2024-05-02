@@ -219,10 +219,14 @@ void DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem)
  **/
 void fetch(){
     fetched = &Imem->Imemory[pc->address++];
+    printf("fetched %d\n", *fetched);
 }
 void decode(){
-    if(fetched)
+    if(fetched){
         decoded = decodeInstruction(*fetched);
+        printf("decoded into opcode: %d, operand1: %d, operand2/immediate: %d,",
+               decoded->opcode, decoded->operand1, decoded->operand2);
+    }
 }
 void execute(){
     if(decoded){
@@ -269,6 +273,7 @@ void updateNSZ(int res){
     sreg->N = checkBit(res, 7);
     sreg->S = sreg->N ^ sreg->V;
     sreg->Z = res == 0;
+    printf("Status register: %d", sreg);
 }
 
 void add(uint8_t operand1, uint8_t operand2){
@@ -278,8 +283,8 @@ void add(uint8_t operand1, uint8_t operand2){
     int posOp2 = checkBit(gprs->GPRegisters[operand2], 7);
     int posRes = checkBit(result, 7);
 
-    sreg->V = posOp1 == posOp2 && posRes != posOp2;
     sreg->C = checkBit(result, 8);
+    sreg->V = posOp1 == posOp2 && posRes != posOp2;
     updateNSZ(result);
     gprs->GPRegisters[operand1] = result;
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
@@ -291,6 +296,8 @@ void sub(uint8_t operand1, uint8_t operand2){
     int posOp1 = checkBit(gprs->GPRegisters[operand1], 7);
     int posOp2 = checkBit(gprs->GPRegisters[operand2], 7);
     int posRes = checkBit(result, 7);
+
+    sreg->C = checkBit(result, 8);
     sreg->V = posOp1 != posOp2 && posRes == posOp2 ;
     updateNSZ(result);
     gprs->GPRegisters[operand1] = result;
@@ -300,6 +307,8 @@ void mul(uint8_t operand1, uint8_t operand2){
     printf("multiplying R%d to R%d\n", operand1, operand2);
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
     int result = gprs->GPRegisters[operand1] * gprs->GPRegisters[operand2];
+
+    sreg->C = checkBit(result, 8);
     updateNSZ(result);
     gprs->GPRegisters[operand1] = result;
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
@@ -312,11 +321,12 @@ void ldi(uint8_t operand1, uint8_t imm){
 }
 // odd one. Don't know what to do during pipeline
 // TODO: figure out what happens during pipeline
+// TODO: pc value correct?
 void beqz(uint8_t operand1, uint8_t imm){
     printf("checking if R%d = 0\n", operand1);
     if(gprs->GPRegisters[operand1] == 0){
         printf("branching to %d \n", pc->address + imm);
-        pc->address += imm; // no need to add 1 because pc already incremented
+        pc->address += imm-1; // no need to add 1 because pc already incremented
         // reset fetched and decoded because they will not be executed
         fetched = NULL;
         free(decoded);
