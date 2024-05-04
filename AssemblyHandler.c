@@ -361,18 +361,21 @@ void jr(uint8_t operand1, uint8_t operand2){
 }
 void slc(uint8_t operand1, uint8_t imm){
     printf("Circular shift left R%d by %d\n", operand1, imm);
-    // TODO: to be tested if unsigned shift
-    int result = (gprs->GPRegisters[imm] << imm) |
-            ((gprs->GPRegisters[imm] >> (8-imm))/* & ((1<<imm) -1)*/ );
+    // TODO: unsigned shift to be tested
+    int result = (gprs->GPRegisters[operand1] << imm) |
+            ((gprs->GPRegisters[operand1] >> (8-imm))/* & ((1<<imm) -1)*/ );
+    sreg->V = checkBit(gprs->GPRegisters[operand1], 7) != checkBit(result, 7);
+    updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
 
 }
 // bit shift on unsigned type is unsigned
-// TODO: update status register
 void src(uint8_t operand1, uint8_t imm){
     printf("Circular shift right R%d by %d\n", operand1, imm);
-    int result = (gprs->GPRegisters[imm] >> imm) |
-                                  (gprs->GPRegisters[imm] << (8-imm));
+    int result = (gprs->GPRegisters[operand1] >> imm) |
+                                  (gprs->GPRegisters[operand1] << (8-imm));
+    sreg->V = checkBit(gprs->GPRegisters[operand1], 7) != checkBit(result, 7);
+    updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
 }
 void lb(uint8_t operand1, uint8_t address){
