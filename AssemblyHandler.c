@@ -21,7 +21,7 @@ GPRs *gprs;
 DataMemory *Dmem;
 SREG *sreg;
 
-int clock = 0;
+int clock = 1;
 int numOfInstructions = 0  ;
 uint16_t *fetched = NULL ; // TODO: make null until next instruction is fetched
 DecodedInstruction* decoded;
@@ -217,14 +217,18 @@ void DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem)
 //          based on the 4 bits of the operation will determine
 //      for the 4 bits . do the operation based on these 4 bits  0000 -> +
  **/
-void fetch(){
+int fetch(){
     fetched = &Imem->Imemory[pc->address++];
     printf("fetched %d\n", *fetched);
+    if(*fetched == 0)
+        return 0;
+    else
+        return 1;
 }
 void decode(){
     if(fetched){
         decoded = decodeInstruction(*fetched);
-        printf("decoded into opcode: %d, operand1: %d, operand2/immediate: %d,",
+        printf("decoded into opcode: %d, operand1: %d, operand2/immediate: %d\n",
                decoded->opcode, decoded->operand1, decoded->operand2);
     }
 }
@@ -253,22 +257,26 @@ void end(){
     free(sreg);
     free(decoded);
 }
-//int main(){
-//
-//    init();
-//    printf("no instructions: %i", numOfInstructions);
-//    // TODO: figure out time with jump instructions
-//    for(clock = 0; clock < 3 + numOfInstructions - 1; clock++){
-//        printf("clock cycle: %d\n", clock);
-//        execute();
-//        decode();
-//        fetch();
-//    }
-//
-//    IMPrint(Imem);
-//
-//    end();
-//}
+int main(){
+
+    init();
+
+    while(1){
+        printf("Clock Cycle %d\n", clock);
+        execute();
+        decode();
+        int next = fetch();
+        if(!next)
+            break;
+        clock++;
+    }
+
+    IMPrint(Imem);
+    GPRsPrint(gprs);
+    printf("PC = %d\n", pc->address);
+    printStatus(sreg);
+    end();
+}
 /**
  * updates N, S and Z flags of the status registers
  */
@@ -287,6 +295,7 @@ void updateNSZ(int res){
 void add(uint8_t operand1, uint8_t operand2){
     printf("adding R%d to R%d\n", operand2, operand1);
     int result = gprs->GPRegisters[operand1] + gprs->GPRegisters[operand2];
+    printf("Result is %d", result);
     int posOp1 = checkBit(gprs->GPRegisters[operand1], 7);
     int posOp2 = checkBit(gprs->GPRegisters[operand2], 7);
     int posRes = checkBit(result, 7);
@@ -305,8 +314,8 @@ void add(uint8_t operand1, uint8_t operand2){
  */
 void sub(uint8_t operand1, uint8_t operand2){
     printf("subtracting R%d from R%d\n", operand2, operand1);
-    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
     int result = gprs->GPRegisters[operand1] - gprs->GPRegisters[operand2];
+    printf("Result is %d", result);
     int posOp1 = checkBit(gprs->GPRegisters[operand1], 7);
     int posOp2 = checkBit(gprs->GPRegisters[operand2], 7);
     int posRes = checkBit(result, 7);
@@ -327,16 +336,19 @@ void mul(uint8_t operand1, uint8_t operand2){
     printf("multiplying R%d to R%d\n", operand1, operand2);
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
     int result = gprs->GPRegisters[operand1] * gprs->GPRegisters[operand2];
+    printf("Result is %d", result);
 
     sreg->C = checkBit(result, 8);
+    sreg->V = 0;
     updateNSZ(result);
 
     GPRsWrite(gprs, operand1, result);
 }
 /**
- *
- * @param operand1
- * @param imm
+ * Performs the LDI instruction
+ * loads an immediate value into the specified register
+ * @param operand1 the register to be loaded
+ * @param imm the value to load
  */
 void ldi(uint8_t operand1, uint8_t imm){
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
@@ -344,8 +356,12 @@ void ldi(uint8_t operand1, uint8_t imm){
 
     GPRsWrite(gprs, operand1, imm);
 }
-// odd one. Don't know what to do during pipeline
-// TODO: figure out what happens during pipeline
+/**
+ * Performs the BEQZ instruction
+ * if the register contains 0 then jumps relative the the current pc
+ * @param operand1 the register to be checked
+ * @param imm the value to jump
+ */
 // TODO: pc value correct?
 void beqz(uint8_t operand1, uint8_t imm){
     printf("checking if R%d = 0\n", operand1);
@@ -358,15 +374,27 @@ void beqz(uint8_t operand1, uint8_t imm){
     }
     printf("no branch\n");
 }
+/**
+ * Performs the AND instruction
+ * Does a bitwise and on two registers and stores
+ * @param operand1
+ * @param operand2
+ */
 void and(uint8_t operand1, uint8_t operand2){
     printf("and-ing  R%d and R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] & gprs->GPRegisters[operand2];
+    printf("Result is %d", result);
+    sreg->C = 0;
+    sreg->V = 0;
     updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
 }
 void or(uint8_t operand1, uint8_t operand2){
     printf("or-ing  R%d and R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] | gprs->GPRegisters[operand2];
+    printf("Result is %d", result);
+    sreg->C = 0;
+    sreg->V = 0;
     updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
 }
@@ -384,6 +412,8 @@ void slc(uint8_t operand1, uint8_t imm){
     // TODO: unsigned shift to be tested
     int result = (gprs->GPRegisters[operand1] << imm) |
             ((gprs->GPRegisters[operand1] >> (8-imm))/* & ((1<<imm) -1)*/ );
+    printf("Result is %d", result);
+    sreg->C = 0;
     sreg->V = checkBit(gprs->GPRegisters[operand1], 7) != checkBit(result, 7);
     updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
@@ -393,6 +423,8 @@ void src(uint8_t operand1, uint8_t imm){
     printf("Circular shift right R%d by %d\n", operand1, imm);
     int result = (gprs->GPRegisters[operand1] >> imm) |
                                   (gprs->GPRegisters[operand1] << (8-imm));
+    printf("Result is %d", result);
+    sreg->C = 0;
     sreg->V = checkBit(gprs->GPRegisters[operand1], 7) != checkBit(result, 7);
     updateNSZ(result);
     GPRsWrite(gprs, operand1, result);

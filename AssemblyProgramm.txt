@@ -1,7 +1,5 @@
+LDI R2 #60
+LDI R1 #2
 ADD R1 R2
 SUB R2 R3
 MUL R2 R4
-
-
-
-

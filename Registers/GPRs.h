@@ -59,5 +59,12 @@ void GPRsWrite(GPRs *gprs, uint8_t address, uint8_t data){
     printf("writing %d to R%d\n",data, address);
 }
 
+void GPRsPrint(GPRs *gprs){
+    for(int i = 0; i<64; i++){
+        printf("R%d = %d\n", i, gprs->GPRegisters[i]);
+    }
+
+}
+
 
 #endif //PROCESSOR_DESIGN_GPRS_H
