@@ -379,9 +379,8 @@ void src(uint8_t operand1, uint8_t imm){
     GPRsWrite(gprs, operand1, result);
 }
 void lb(uint8_t operand1, uint8_t address){
-    printf("loading byte from memory address %d into R%d", address, operand1);
+    printf("loading byte %d from memory address %d into R%d", Dmem->Dmemory[address], address, operand1);
     GPRsWrite(gprs, operand1, Dmem->Dmemory[address]);
-
 }
 void sb(uint8_t operand1, uint8_t address){
     printf("storing byte %d from R%d into memory address %d", gprs->GPRegisters[operand1], address, operand1);
