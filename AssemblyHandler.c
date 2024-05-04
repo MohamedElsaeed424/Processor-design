@@ -269,13 +269,21 @@ void end(){
 //
 //    end();
 //}
+/**
+ * updates N, S and Z flags of the status registers
+ */
 void updateNSZ(int res){
     sreg->N = checkBit(res, 7);
     sreg->S = sreg->N ^ sreg->V;
     sreg->Z = res == 0;
     printStatus(sreg);
 }
-
+/**
+ * Performs the addition instruction (ie. ADD R1 R2).
+ * Adds register R2 to register R1
+ * @param operand1 the first register in the instruction
+ * @param operand2 the second register in the instruction
+ */
 void add(uint8_t operand1, uint8_t operand2){
     printf("adding R%d to R%d\n", operand2, operand1);
     int result = gprs->GPRegisters[operand1] + gprs->GPRegisters[operand2];
@@ -288,8 +296,13 @@ void add(uint8_t operand1, uint8_t operand2){
     updateNSZ(result);
 
     GPRsWrite(gprs, operand1, result);
-    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
+/**
+ * Performs the subtraction instruction (ie. SUB R1 R2).
+ * subtracts register R2 from register R1
+ * @param operand1 the first register in the instruction
+ * @param operand2 the second register in the instruction
+ */
 void sub(uint8_t operand1, uint8_t operand2){
     printf("subtracting R%d from R%d\n", operand2, operand1);
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
@@ -303,8 +316,13 @@ void sub(uint8_t operand1, uint8_t operand2){
     updateNSZ(result);
 
     GPRsWrite(gprs, operand1, result);
-    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
+/**
+ * Performs the multiplication instruction (ie. MUL R1 R2).
+ * Multiplies register R2 to register R1
+ * @param operand1 the first register in the instruction
+ * @param operand2 the second register in the instruction
+ */
 void mul(uint8_t operand1, uint8_t operand2){
     printf("multiplying R%d to R%d\n", operand1, operand2);
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
@@ -314,15 +332,17 @@ void mul(uint8_t operand1, uint8_t operand2){
     updateNSZ(result);
 
     GPRsWrite(gprs, operand1, result);
-    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
+/**
+ *
+ * @param operand1
+ * @param imm
+ */
 void ldi(uint8_t operand1, uint8_t imm){
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
     printf("loading value %d into R%d\n", imm, operand1);
 
     GPRsWrite(gprs, operand1, imm);
-
-    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 // odd one. Don't know what to do during pipeline
 // TODO: figure out what happens during pipeline
@@ -330,8 +350,8 @@ void ldi(uint8_t operand1, uint8_t imm){
 void beqz(uint8_t operand1, uint8_t imm){
     printf("checking if R%d = 0\n", operand1);
     if(gprs->GPRegisters[operand1] == 0){
-        printf("branching to %d \n", pc->address + imm);
-        pc->address += imm-1; // no need to add 1 because pc already incremented
+        pc->address += imm-1;
+        printf("branching to %d \n", pc->address);
         // reset fetched and decoded because they will not be executed
         fetched = NULL;
         free(decoded);
@@ -350,7 +370,7 @@ void or(uint8_t operand1, uint8_t operand2){
     updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
 }
-// odd one. Don't know what to do during pipeline
+
 // TODO: figure out what happens during pipeline and if R1 || R2 is bigger than 1024
 void jr(uint8_t operand1, uint8_t operand2){
     pc->address = (gprs->GPRegisters[operand1] << 8) | gprs->GPRegisters[operand2];
@@ -367,9 +387,8 @@ void slc(uint8_t operand1, uint8_t imm){
     sreg->V = checkBit(gprs->GPRegisters[operand1], 7) != checkBit(result, 7);
     updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
-
 }
-// bit shift on unsigned type is unsigned
+
 void src(uint8_t operand1, uint8_t imm){
     printf("Circular shift right R%d by %d\n", operand1, imm);
     int result = (gprs->GPRegisters[operand1] >> imm) |
