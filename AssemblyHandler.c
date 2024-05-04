@@ -273,7 +273,7 @@ void updateNSZ(int res){
     sreg->N = checkBit(res, 7);
     sreg->S = sreg->N ^ sreg->V;
     sreg->Z = res == 0;
-    printf("Status register: %d", sreg);
+    printStatus(sreg);
 }
 
 void add(uint8_t operand1, uint8_t operand2){
@@ -286,7 +286,8 @@ void add(uint8_t operand1, uint8_t operand2){
     sreg->C = checkBit(result, 8);
     sreg->V = posOp1 == posOp2 && posRes != posOp2;
     updateNSZ(result);
-    gprs->GPRegisters[operand1] = result;
+
+    GPRsWrite(gprs, operand1, result);
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 void sub(uint8_t operand1, uint8_t operand2){
@@ -300,7 +301,8 @@ void sub(uint8_t operand1, uint8_t operand2){
     sreg->C = checkBit(result, 8);
     sreg->V = posOp1 != posOp2 && posRes == posOp2 ;
     updateNSZ(result);
-    gprs->GPRegisters[operand1] = result;
+
+    GPRsWrite(gprs, operand1, result);
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 void mul(uint8_t operand1, uint8_t operand2){
@@ -310,13 +312,16 @@ void mul(uint8_t operand1, uint8_t operand2){
 
     sreg->C = checkBit(result, 8);
     updateNSZ(result);
-    gprs->GPRegisters[operand1] = result;
+
+    GPRsWrite(gprs, operand1, result);
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 void ldi(uint8_t operand1, uint8_t imm){
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
     printf("loading value %d into R%d\n", imm, operand1);
-    gprs->GPRegisters[operand1] = imm;
+
+    GPRsWrite(gprs, operand1, imm);
+
     printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
 }
 // odd one. Don't know what to do during pipeline
@@ -337,13 +342,13 @@ void and(uint8_t operand1, uint8_t operand2){
     printf("and-ing  R%d and R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] & gprs->GPRegisters[operand2];
     updateNSZ(result);
-    gprs->GPRegisters[operand1] = result;
+    GPRsWrite(gprs, operand1, result);
 }
 void or(uint8_t operand1, uint8_t operand2){
     printf("or-ing  R%d and R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] | gprs->GPRegisters[operand2];
     updateNSZ(result);
-    gprs->GPRegisters[operand1] = result;
+    GPRsWrite(gprs, operand1, result);
 }
 // odd one. Don't know what to do during pipeline
 // TODO: figure out what happens during pipeline and if R1 || R2 is bigger than 1024
@@ -356,21 +361,27 @@ void jr(uint8_t operand1, uint8_t operand2){
 }
 void slc(uint8_t operand1, uint8_t imm){
     printf("Circular shift left R%d by %d\n", operand1, imm);
-    gprs->GPRegisters[operand1] = (gprs->GPRegisters[imm] << imm) |
+    // TODO: to be tested if unsigned shift
+    int result = (gprs->GPRegisters[imm] << imm) |
             ((gprs->GPRegisters[imm] >> (8-imm))/* & ((1<<imm) -1)*/ );
+    GPRsWrite(gprs, operand1, result);
+
 }
 // bit shift on unsigned type is unsigned
+// TODO: update status register
 void src(uint8_t operand1, uint8_t imm){
     printf("Circular shift right R%d by %d\n", operand1, imm);
-    gprs->GPRegisters[operand1] = (gprs->GPRegisters[imm] >> imm) |
+    int result = (gprs->GPRegisters[imm] >> imm) |
                                   (gprs->GPRegisters[imm] << (8-imm));
+    GPRsWrite(gprs, operand1, result);
 }
 void lb(uint8_t operand1, uint8_t address){
     printf("loading byte from memory address %d into R%d", address, operand1);
-    gprs->GPRegisters[operand1] = Dmem->Dmemory[address];
+    GPRsWrite(gprs, operand1, Dmem->Dmemory[address]);
+
 }
 void sb(uint8_t operand1, uint8_t address){
-    printf("storing byte from R%d into memory address %d", address, operand1);
+    printf("storing byte %d from R%d into memory address %d", gprs->GPRegisters[operand1], address, operand1);
     Dmem->Dmemory[address] = gprs->GPRegisters[operand1];
 }
 

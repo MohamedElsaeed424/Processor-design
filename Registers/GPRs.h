@@ -18,7 +18,7 @@ typedef struct {
 
 /**
  * Initializing GPRs with values
- * @param gprs : refrence to the GPRs
+ * @param gprs : reference to the GPRs
  */
 void GPRsInit(GPRs **gprs){
     *gprs = calloc(1, sizeof(GPRs));
@@ -26,7 +26,7 @@ void GPRsInit(GPRs **gprs){
 
 /**
  * Reading from GPRs
- * @param gprs : refrence to the GPRs
+ * @param gprs : reference to the GPRs
  * @param address : address is 6 bits because GPRS_SIZE =64 So
  *                  log(64) =6 --> 8
  */
@@ -35,7 +35,7 @@ uint16_t GPRsRead(GPRs *gprs, uint8_t address){
         printf("This Address not in GPRs range of Addresses");
         return -1 ;
     }
-    printf("reading from R%d",address);
+    printf("reading from R%d\n",address);
     return gprs->GPRegisters[address];
 }
 
@@ -49,13 +49,14 @@ uint16_t GPRsRead(GPRs *gprs, uint8_t address){
  */
 
 void GPRsWrite(GPRs *gprs, uint8_t address, uint8_t data){
-
     if(address >= GPRS_SIZE){
-        printf("This Address not in GPRs range of Addresses");
+        printf("This Address not in GPRs range of Addresses\n");
         return ;
     }
+    if(address == 0)
+        return;
     gprs->GPRegisters[address] = data ;
-    printf("writing %d to R%d",data, address);
+    printf("writing %d to R%d\n",data, address);
 }
 
 
