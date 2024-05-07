@@ -105,7 +105,7 @@ void ReadAssemblyTextFile() {
             }
         }
         int numberOfInstructions = instructionsArrIdx + 1;
-        numOfInstructions = numberOfInstructions-1 ;// TODO: numofintruction habal
+        numOfInstructions = numberOfInstructions ;// TODO: numofintruction habal
         fclose(file);
     }
 }
@@ -272,6 +272,7 @@ int main(){
         if(clock > 24)
             break;
         clock++;
+        printf("\n");
     }
 
     IMPrint(Imem);
