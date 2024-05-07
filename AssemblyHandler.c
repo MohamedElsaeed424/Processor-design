@@ -27,58 +27,54 @@ uint16_t *fetched = NULL ; // TODO: make null until next instruction is fetched
 DecodedInstruction* decoded;
 
 // function prototypes
-void add(uint8_t operand1, uint8_t operand2);
-void sub(uint8_t operand1, uint8_t operand2);
-void mul(uint8_t operand1, uint8_t operand2);
-void ldi(uint8_t operand1, uint8_t imm);
-void beqz(uint8_t operand1, uint8_t imm);
-void and(uint8_t operand1, uint8_t operand2);
-void or(uint8_t operand1, uint8_t operand2);
-void jr(uint8_t operand1, uint8_t operand2);
+int add(uint8_t operand1, uint8_t operand2);
+int sub(uint8_t operand1, uint8_t operand2);
+int mul(uint8_t operand1, uint8_t operand2);
+int ldi(uint8_t operand1, uint8_t imm);
+int beqz(uint8_t operand1, uint8_t imm);
+int and(uint8_t operand1, uint8_t operand2);
+int or(uint8_t operand1, uint8_t operand2);
+int jr(uint8_t operand1, uint8_t operand2);
 
-void slc(uint8_t operand1, uint8_t imm);
-void src(uint8_t operand1, uint8_t imm);
-void lb(uint8_t operand1, uint8_t address);
-void sb(uint8_t operand1, uint8_t address);
+int slc(uint8_t operand1, uint8_t imm);
+int src(uint8_t operand1, uint8_t imm);
+int lb(uint8_t operand1, uint8_t address);
+int sb(uint8_t operand1, uint8_t address);
 
-void (*opFuncs[])(uint8_t, uint8_t) = { add,  sub,  mul, ldi, beqz, and, or,
+int (*opFuncs[])(uint8_t, uint8_t) = { add,  sub,  mul, ldi, beqz, and, or,
                                         jr, slc, src, lb, sb};
 /**
  * Reading from assembly text file and store all instructions
  * and secondOperands to array of instruction
  * @return
  */
-void ReadAssemblyTextFile(InstructionsArr **IArr) {
+void ReadAssemblyTextFile() {
     char fileName[] = "AssemblyProgramm.txt";
     FILE *file = fopen(fileName, "r");
     if (file == NULL) {
         perror("Error opening file");
-        *IArr = NULL;
+        IArr = NULL;
     }
     int instructionsArrIdx = 0;
     //allocating the memory size to be max size of instruction which is 18 byte
     //and the maximum number of instructions which is 10 bits approx 2 bytes
-    *IArr = calloc(1024, INSTRUCTION_SIZE_IN_BYTES);
+    IArr = calloc(1, sizeof(InstructionsArr) );
 
     char line[MAX_LINE_LENGTH];
-    if (*IArr == NULL) {
+    if (IArr == NULL) {
         printf("Memory allocation failure");
-        IArr = NULL;
     } else {
         // Read lines from the file until EOF is reached
         while (fgets(line, MAX_LINE_LENGTH, file) != NULL) {
             // Tokenize the line using strtok
             char *token = strtok(line, " \n");
-
             // Assuming each line has three tokens: instruction, secondOperand1, secondOperand2
             if (token != NULL) {
                 char instruction[4];
                 char secondOperand1[6];
                 char secondOperand2[6];
-
                 // Copy the first token (instruction)
                 strcpy(instruction, token);
-
                 // Get the next token (secondOperand1)
                 token = strtok(NULL, " \n");
                 if (token != NULL) {
@@ -94,7 +90,7 @@ void ReadAssemblyTextFile(InstructionsArr **IArr) {
                         strcpy(I.firstOp, secondOperand1);
                         strcpy(I.secondOp, secondOperand2);
 //                    printf("%s %s %s \n" ,I.operation, I.firstOp ,I.secondOp ) ;
-                        InstructionArrWrite(*IArr, I, instructionsArrIdx);
+                        InstructionArrWrite(IArr, I, instructionsArrIdx);
                         ++instructionsArrIdx;
                         // Print or process the parsed instruction and secondOperands
 //                    printf("Instruction: %s, Operand1: %s, Operand2: %s\n", instruction, secondOperand1, secondOperand2);
@@ -122,25 +118,25 @@ unsigned char decodeOperation(char *opcode) {
         return 0b0000;
     } else if (strcmp(opcode, "SUB") == 0) {
         return 0b0001;
-    } else if (strcmp(opcode, "MUL") == 0) {
+    } else if (strcmp(opcode,"MUL") == 0) {
         return 0b0010;
-    } else if (strcmp(opcode, "LDI") == 0) {
+    } else if (strcmp(opcode,"LDI") == 0) {
         return 0b0011;
-    } else if (strcmp(opcode, "BEQZ") == 0) {
+    } else if (strcmp(opcode,"BEQZ") == 0) {
         return 0b0100;
-    } else if (strcmp(opcode, "AND") == 0) {
+    } else if (strcmp(opcode,"AND") == 0) {
         return 0b0101;
-    } else if (strcmp(opcode, "OR") == 0) {
+    } else if (strcmp(opcode,"OR") == 0) {
         return 0b0110;
-    } else if (strcmp(opcode, "JR") == 0) {
+    } else if (strcmp(opcode,"JR") == 0) {
         return 0b0111;
-    } else if (strcmp(opcode, "SLC") == 0) {
+    } else if (strcmp(opcode,"SLC") == 0) {
         return 0b1000;
-    } else if (strcmp(opcode, "SRC") == 0) {
+    } else if (strcmp(opcode,"SRC") == 0) {
         return 0b1001;
-    } else if (strcmp(opcode, "LB") == 0) {
+    } else if (strcmp(opcode,"LB") == 0) {
         return 0b1010;
-    } else if (strcmp(opcode, "SB") == 0) {
+    } else if (strcmp(opcode,"SB") == 0) {
         return 0b1011;
     } else {
         printf("This Opcode not exist in out ISA\n");
@@ -186,11 +182,11 @@ unsigned char decodeSecondOperand(const char *secondOperand) {
 }
 
 uint16_t decodeOneInstruction(Instruction i){
-    unsigned char opcode =decodeOperation(i.operation); // 4 bits
+    unsigned char opcode = decodeOperation(i.operation); // 4 bits
     unsigned char firstOpr = decodeFirstOperand(i.firstOp); // 6 bits
     unsigned char secondOpr = decodeSecondOperand(i.secondOp); // 6 bits
     printf("%i\n",opcode) ;
-    printf("%s\n",i.operation) ;
+    printf("%s\n",i.operation);
     uint16_t instruction = 0;
     instruction |= (opcode & 0x0F) << 12;     // Shift opcode to the most significant bits
     instruction |= (firstOpr & 0x3F) << 6;    // Shift first operand into position
@@ -219,7 +215,7 @@ void DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem)
  **/
 int fetch(){
     fetched = &Imem->Imemory[pc->address++];
-    printf("fetched %d\n", *fetched);
+    printf("fetched 0x%x\n", *fetched);
     if(*fetched == 0)
         return 2;
     else
@@ -232,9 +228,9 @@ void decode(){
                decoded->opcode, decoded->operand1, decoded->operand2);
     }
 }
-void execute(){
+int execute(){
     if(decoded){
-        opFuncs[decoded->opcode] (decoded->operand1, decoded->operand2);
+        return opFuncs[decoded->opcode] (decoded->operand1, decoded->operand2);
     }
 }
 
@@ -262,12 +258,19 @@ int main(){
     init();
     int next = 1044;
 
-    while(--next==0){
+    while(1){
         printf("Clock Cycle %d\n", clock);
         printf("PC: %d\n", pc->address);
-        execute();
+        printf("inst: %x\n", Imem->Imemory[pc->address]);
+
+        if(execute()){
+            clock++;
+            continue;
+        }
         decode();
         next = fetch();
+        if(clock > 24)
+            break;
         clock++;
     }
 
@@ -291,7 +294,7 @@ void updateNSZ(int res){
  * @param operand1 the first register in the instruction
  * @param operand2 the second register in the instruction
  */
-void add(uint8_t operand1, uint8_t operand2){
+int add(uint8_t operand1, uint8_t operand2){
     printf("adding R%d to R%d\n", operand2, operand1);
     int result = gprs->GPRegisters[operand1] + gprs->GPRegisters[operand2];
     printf("Result is %d\n", result);
@@ -305,6 +308,7 @@ void add(uint8_t operand1, uint8_t operand2){
     updateNSZ(result);
 
     GPRsWrite(gprs, operand1, result);
+    return 0;
 }
 /**
  * Performs the subtraction instruction (ie. SUB R1 R2).
@@ -312,7 +316,7 @@ void add(uint8_t operand1, uint8_t operand2){
  * @param operand1 the first register in the instruction
  * @param operand2 the second register in the instruction
  */
-void sub(uint8_t operand1, uint8_t operand2){
+int sub(uint8_t operand1, uint8_t operand2){
     printf("subtracting R%d from R%d\n", operand2, operand1);
     int result = gprs->GPRegisters[operand1] - gprs->GPRegisters[operand2];
     printf("Result is %d\n", result);
@@ -325,6 +329,8 @@ void sub(uint8_t operand1, uint8_t operand2){
     updateNSZ(result);
 
     GPRsWrite(gprs, operand1, result);
+    return 0;
+
 }
 /**
  * Performs the multiplication instruction (ie. MUL R1 R2).
@@ -332,7 +338,7 @@ void sub(uint8_t operand1, uint8_t operand2){
  * @param operand1 the first register in the instruction
  * @param operand2 the second register in the instruction
  */
-void mul(uint8_t operand1, uint8_t operand2){
+int mul(uint8_t operand1, uint8_t operand2){
     printf("multiplying R%d to R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] * gprs->GPRegisters[operand2];
     printf("Result is %d\n", result);
@@ -342,6 +348,8 @@ void mul(uint8_t operand1, uint8_t operand2){
     updateNSZ(result);
 
     GPRsWrite(gprs, operand1, result);
+    return 0;
+
 }
 /**
  * Performs the LDI instruction
@@ -349,10 +357,12 @@ void mul(uint8_t operand1, uint8_t operand2){
  * @param operand1 the register to be loaded
  * @param imm the value to load
  */
-void ldi(uint8_t operand1, uint8_t imm){
+int ldi(uint8_t operand1, uint8_t imm){
     printf("loading value %d into R%d\n", imm, operand1);
 
     GPRsWrite(gprs, operand1, imm);
+    return 0;
+
 }
 /**
  * Performs the BEQZ instruction
@@ -361,7 +371,7 @@ void ldi(uint8_t operand1, uint8_t imm){
  * @param imm the value to jump
  */
 // TODO: pc value correct?
-void beqz(uint8_t operand1, uint8_t imm){
+int beqz(uint8_t operand1, uint8_t imm){
     printf("checking if R%d = 0\n", operand1);
     if(gprs->GPRegisters[operand1] == 0){
         pc->address += imm-1;
@@ -369,8 +379,11 @@ void beqz(uint8_t operand1, uint8_t imm){
         // reset fetched and decoded because they will not be executed
         fetched = NULL;
         free(decoded);
+        decoded = NULL;
+        return 1;
     }
     printf("no branch\n");
+    return 0;
 }
 /**
  * Performs the AND instruction
@@ -378,7 +391,7 @@ void beqz(uint8_t operand1, uint8_t imm){
  * @param operand1
  * @param operand2
  */
-void and(uint8_t operand1, uint8_t operand2){
+int and(uint8_t operand1, uint8_t operand2){
     printf("and-ing  R%d and R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] & gprs->GPRegisters[operand2];
     printf("Result is %d\n", result);
@@ -386,8 +399,10 @@ void and(uint8_t operand1, uint8_t operand2){
     sreg->V = 0;
     updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
+    return 0;
+
 }
-void or(uint8_t operand1, uint8_t operand2){
+int or(uint8_t operand1, uint8_t operand2){
     printf("or-ing  R%d and R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] | gprs->GPRegisters[operand2];
     printf("Result is %d", result);
@@ -395,17 +410,21 @@ void or(uint8_t operand1, uint8_t operand2){
     sreg->V = 0;
     updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
+    return 0;
+
 }
 
 // TODO: figure out what happens if R1 || R2 is bigger than 1024
-void jr(uint8_t operand1, uint8_t operand2){
+int jr(uint8_t operand1, uint8_t operand2){
     pc->address = (gprs->GPRegisters[operand1] << 8) | gprs->GPRegisters[operand2];
     printf("jumping to %d\n", pc->address);
     // reset fetched and decoded because they will not be executed
     fetched = NULL;
     free(decoded);
+    decoded = NULL;
+    return 1;
 }
-void slc(uint8_t operand1, uint8_t imm){
+int slc(uint8_t operand1, uint8_t imm){
     printf("Circular shift left R%d by %d\n", operand1, imm);
     // TODO: unsigned shift to be tested
     int result = (gprs->GPRegisters[operand1] << imm) |
@@ -415,9 +434,10 @@ void slc(uint8_t operand1, uint8_t imm){
     sreg->V = checkBit(gprs->GPRegisters[operand1], 7) != checkBit(result, 7);
     updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
+    return 0;
 }
 
-void src(uint8_t operand1, uint8_t imm){
+int src(uint8_t operand1, uint8_t imm){
     printf("Circular shift right R%d by %d\n", operand1, imm);
     int result = (gprs->GPRegisters[operand1] >> imm) |
                                   (gprs->GPRegisters[operand1] << (8-imm));
@@ -426,14 +446,17 @@ void src(uint8_t operand1, uint8_t imm){
     sreg->V = checkBit(gprs->GPRegisters[operand1], 7) != checkBit(result, 7);
     updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
+    return 0;
 }
-void lb(uint8_t operand1, uint8_t address){
+int lb(uint8_t operand1, uint8_t address){
     printf("loading byte %d from memory address %d into R%d\n", Dmem->Dmemory[address], address, operand1);
     GPRsWrite(gprs, operand1, Dmem->Dmemory[address]);
+    return 0;
 }
-void sb(uint8_t operand1, uint8_t address){
+int sb(uint8_t operand1, uint8_t address){
     printf("storing byte %d from R%d into memory address %d\n", gprs->GPRegisters[operand1], address, operand1);
     Dmem->Dmemory[address] = gprs->GPRegisters[operand1];
+    return 0;
 }
 
 

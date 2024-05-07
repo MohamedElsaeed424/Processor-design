@@ -8,9 +8,10 @@
 #endif //PROCESSOR_DESIGN_INSTRUCTION_H
 #define INSTRUCTION_MEM_SIZE 1024
 
+// ADDZR1\0R2
 typedef struct {
-    char operation[4] ;
-    char firstOp[3] ; // Reg
+    char operation[5] ;
+    char firstOp[4] ; // Reg
     char secondOp[6] ; // Reg or IMM or Address
 }Instruction;
 
