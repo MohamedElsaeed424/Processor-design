@@ -109,7 +109,7 @@ void ReadAssemblyTextFile(InstructionsArr **IArr) {
             }
         }
         int numberOfInstructions = instructionsArrIdx + 1;
-        numOfInstructions = numberOfInstructions ;
+        numOfInstructions = numberOfInstructions-1 ;// TODO: numofintruction habal
         fclose(file);
     }
 }
@@ -221,9 +221,9 @@ int fetch(){
     fetched = &Imem->Imemory[pc->address++];
     printf("fetched %d\n", *fetched);
     if(*fetched == 0)
-        return 0;
+        return 2;
     else
-        return 1;
+        return 2044;
 }
 void decode(){
     if(fetched){
@@ -248,7 +248,7 @@ void init(){
     DMInit(&Dmem);
     SregInit(&sreg);
 }
-void end(){
+void terminate(){
     free(IArr) ;
     free(Imem) ;
     free(pc) ;
@@ -260,14 +260,14 @@ void end(){
 int main(){
 
     init();
+    int next = 1044;
 
-    while(1){
+    while(--next==0){
         printf("Clock Cycle %d\n", clock);
+        printf("PC: %d\n", pc->address);
         execute();
         decode();
-        int next = fetch();
-        if(!next)
-            break;
+        next = fetch();
         clock++;
     }
 
@@ -275,14 +275,13 @@ int main(){
     GPRsPrint(gprs);
     printf("PC = %d\n", pc->address);
     printStatus(sreg);
-    end();
+    terminate();
 }
 /**
  * updates N, S and Z flags of the status registers
  */
 void updateNSZ(int res){
     sreg->N = checkBit(res, 7);
-    sreg->S = sreg->N ^ sreg->V;
     sreg->Z = res == 0;
     printStatus(sreg);
 }
@@ -295,13 +294,14 @@ void updateNSZ(int res){
 void add(uint8_t operand1, uint8_t operand2){
     printf("adding R%d to R%d\n", operand2, operand1);
     int result = gprs->GPRegisters[operand1] + gprs->GPRegisters[operand2];
-    printf("Result is %d", result);
+    printf("Result is %d\n", result);
     int posOp1 = checkBit(gprs->GPRegisters[operand1], 7);
     int posOp2 = checkBit(gprs->GPRegisters[operand2], 7);
     int posRes = checkBit(result, 7);
 
     sreg->C = checkBit(result, 8);
     sreg->V = posOp1 == posOp2 && posRes != posOp2;
+    sreg->S = sreg->N ^ sreg->V;
     updateNSZ(result);
 
     GPRsWrite(gprs, operand1, result);
@@ -315,13 +315,13 @@ void add(uint8_t operand1, uint8_t operand2){
 void sub(uint8_t operand1, uint8_t operand2){
     printf("subtracting R%d from R%d\n", operand2, operand1);
     int result = gprs->GPRegisters[operand1] - gprs->GPRegisters[operand2];
-    printf("Result is %d", result);
+    printf("Result is %d\n", result);
     int posOp1 = checkBit(gprs->GPRegisters[operand1], 7);
     int posOp2 = checkBit(gprs->GPRegisters[operand2], 7);
     int posRes = checkBit(result, 7);
 
-    sreg->C = checkBit(result, 8);
     sreg->V = posOp1 != posOp2 && posRes == posOp2 ;
+    sreg->S = sreg->N ^ sreg->V;
     updateNSZ(result);
 
     GPRsWrite(gprs, operand1, result);
@@ -334,9 +334,8 @@ void sub(uint8_t operand1, uint8_t operand2){
  */
 void mul(uint8_t operand1, uint8_t operand2){
     printf("multiplying R%d to R%d\n", operand1, operand2);
-    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
     int result = gprs->GPRegisters[operand1] * gprs->GPRegisters[operand2];
-    printf("Result is %d", result);
+    printf("Result is %d\n", result);
 
     sreg->C = checkBit(result, 8);
     sreg->V = 0;
@@ -351,7 +350,6 @@ void mul(uint8_t operand1, uint8_t operand2){
  * @param imm the value to load
  */
 void ldi(uint8_t operand1, uint8_t imm){
-    printf("R%d after: %d, ", operand1, gprs->GPRegisters[operand1]);
     printf("loading value %d into R%d\n", imm, operand1);
 
     GPRsWrite(gprs, operand1, imm);
@@ -383,7 +381,7 @@ void beqz(uint8_t operand1, uint8_t imm){
 void and(uint8_t operand1, uint8_t operand2){
     printf("and-ing  R%d and R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] & gprs->GPRegisters[operand2];
-    printf("Result is %d", result);
+    printf("Result is %d\n", result);
     sreg->C = 0;
     sreg->V = 0;
     updateNSZ(result);
@@ -399,7 +397,7 @@ void or(uint8_t operand1, uint8_t operand2){
     GPRsWrite(gprs, operand1, result);
 }
 
-// TODO: figure out what happens during pipeline and if R1 || R2 is bigger than 1024
+// TODO: figure out what happens if R1 || R2 is bigger than 1024
 void jr(uint8_t operand1, uint8_t operand2){
     pc->address = (gprs->GPRegisters[operand1] << 8) | gprs->GPRegisters[operand2];
     printf("jumping to %d\n", pc->address);
@@ -412,7 +410,7 @@ void slc(uint8_t operand1, uint8_t imm){
     // TODO: unsigned shift to be tested
     int result = (gprs->GPRegisters[operand1] << imm) |
             ((gprs->GPRegisters[operand1] >> (8-imm))/* & ((1<<imm) -1)*/ );
-    printf("Result is %d", result);
+    printf("Result is %d\n", result);
     sreg->C = 0;
     sreg->V = checkBit(gprs->GPRegisters[operand1], 7) != checkBit(result, 7);
     updateNSZ(result);
@@ -423,18 +421,18 @@ void src(uint8_t operand1, uint8_t imm){
     printf("Circular shift right R%d by %d\n", operand1, imm);
     int result = (gprs->GPRegisters[operand1] >> imm) |
                                   (gprs->GPRegisters[operand1] << (8-imm));
-    printf("Result is %d", result);
+    printf("Result is %d\n", result);
     sreg->C = 0;
     sreg->V = checkBit(gprs->GPRegisters[operand1], 7) != checkBit(result, 7);
     updateNSZ(result);
     GPRsWrite(gprs, operand1, result);
 }
 void lb(uint8_t operand1, uint8_t address){
-    printf("loading byte %d from memory address %d into R%d", Dmem->Dmemory[address], address, operand1);
+    printf("loading byte %d from memory address %d into R%d\n", Dmem->Dmemory[address], address, operand1);
     GPRsWrite(gprs, operand1, Dmem->Dmemory[address]);
 }
 void sb(uint8_t operand1, uint8_t address){
-    printf("storing byte %d from R%d into memory address %d", gprs->GPRegisters[operand1], address, operand1);
+    printf("storing byte %d from R%d into memory address %d\n", gprs->GPRegisters[operand1], address, operand1);
     Dmem->Dmemory[address] = gprs->GPRegisters[operand1];
 }
 

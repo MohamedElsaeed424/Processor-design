@@ -23,9 +23,19 @@
 //}Pair;
 //
 //int main(){
-//    Pair* p = malloc(sizeof(Pair));
-//    printf("%d", p);
-//    free(p);
-//    printf("%d", p);
+////    Pair* p = malloc(sizeof(Pair));
+////    printf("%d", p);
+////    free(p);
+////    printf("%d", p);
+//    signed char x = -1;
+//    int a = x+x;
+//    unsigned char y = -1;
+//    int b = y+y;
+//    printf("x: %d a: %d\n", x, a);
+//    printBits(sizeof(a), &a);
+//    printBits(sizeof(x),&x);
+//    printf("y: %d b: %d\n", y, b);
+//    printBits(sizeof(y),&y);
+//    printBits(sizeof(b), &b);
 //    return 0;
 //}
