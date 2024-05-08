@@ -53,8 +53,6 @@ void GPRsWrite(GPRs *gprs, uint8_t address, uint8_t data){
         printf("This Address not in GPRs range of Addresses\n");
         return ;
     }
-    if(address == 0)
-        return;
     gprs->GPRegisters[address] = data ;
     printf("writing %d to R%d\n",data, address);
 }

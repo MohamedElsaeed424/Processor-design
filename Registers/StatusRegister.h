@@ -67,7 +67,8 @@ void setZ_FLAG(SREG *sreg, uint8_t value) {
 }
 
 void printStatus(SREG *sreg){
-    printf("Status reg: 000 %d %d %d %d %d\n",sreg->Z, sreg->S, sreg->N, sreg->V, sreg->C);
+    printf("            rest C V N S Z     \n");
+    printf("Status reg: 000  %d %d %d %d %d\n",sreg->C, sreg->S, sreg->N, sreg->V, sreg->C);
 }
 int checkBit(int x, int i){
     return (x & (1<<i)) != 0;

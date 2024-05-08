@@ -15,7 +15,7 @@
 #define MAX_LINE_LENGTH 100
 #define INSTRUCTION_SIZE_IN_BYTES 18
 InstructionsArr* IArr ;
-InstructionMemory * Imem ; // TODO: initializing Imem with zeroes is incorrect because 0 is a valid instruction
+InstructionMemory * Imem ;
 PC *pc;
 GPRs *gprs;
 DataMemory *Dmem;
@@ -23,7 +23,7 @@ SREG *sreg;
 
 int clock = 1;
 int numOfInstructions = 0  ;
-uint16_t *fetched = NULL ; // TODO: make null until next instruction is fetched
+uint16_t *fetched = NULL ;
 DecodedInstruction* decoded;
 
 // function prototypes
@@ -216,6 +216,8 @@ void DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem)
 int fetch(){
     fetched = &Imem->Imemory[pc->address++];
     printf("fetched 0x%x\n", *fetched);
+    if(pc->address >= INSTRUCTION_MEM_SIZE)
+        *fetched = -1;
     if(*fetched == 0)
         return 2;
     else
@@ -230,13 +232,15 @@ void decode(){
 }
 int execute(){
     if(decoded){
+        if(decoded->opcode > 11)
+            return -1;
         return opFuncs[decoded->opcode] (decoded->operand1, decoded->operand2);
     }
 }
 
 
 void init(){
-    ReadAssemblyTextFile(&IArr) ;
+    ReadAssemblyTextFile() ;
     IMInit(&Imem) ;
     DecodeAllInstructions(IArr,Imem) ;
     PCInit(&pc);
@@ -262,11 +266,16 @@ int main(){
         printf("Clock Cycle %d\n", clock);
         printf("PC: %d\n", pc->address);
         printf("inst: %x\n", Imem->Imemory[pc->address]);
-
-        if(execute()){
+        int status = execute();
+        // status 1 means there was a jump
+        if(status == 1){
             clock++;
             continue;
+        } else if(status == -1){
+            // status -1 means pc is out of range or terminate
+            break;
         }
+
         decode();
         next = fetch();
         if(clock > 24)
@@ -284,7 +293,7 @@ int main(){
 /**
  * updates N, S and Z flags of the status registers
  */
-void updateNSZ(int res){
+void updateNZ(int res){
     sreg->N = checkBit(res, 7);
     sreg->Z = res == 0;
     printStatus(sreg);
@@ -306,7 +315,7 @@ int add(uint8_t operand1, uint8_t operand2){
     sreg->C = checkBit(result, 8);
     sreg->V = posOp1 == posOp2 && posRes != posOp2;
     sreg->S = sreg->N ^ sreg->V;
-    updateNSZ(result);
+    updateNZ(result);
 
     GPRsWrite(gprs, operand1, result);
     return 0;
@@ -327,7 +336,7 @@ int sub(uint8_t operand1, uint8_t operand2){
 
     sreg->V = posOp1 != posOp2 && posRes == posOp2 ;
     sreg->S = sreg->N ^ sreg->V;
-    updateNSZ(result);
+    updateNZ(result);
 
     GPRsWrite(gprs, operand1, result);
     return 0;
@@ -343,10 +352,8 @@ int mul(uint8_t operand1, uint8_t operand2){
     printf("multiplying R%d to R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] * gprs->GPRegisters[operand2];
     printf("Result is %d\n", result);
-
-    sreg->C = checkBit(result, 8);
-    sreg->V = 0;
-    updateNSZ(result);
+    
+    updateNZ(result);
 
     GPRsWrite(gprs, operand1, result);
     return 0;
@@ -376,6 +383,10 @@ int beqz(uint8_t operand1, uint8_t imm){
     printf("checking if R%d = 0\n", operand1);
     if(gprs->GPRegisters[operand1] == 0){
         pc->address += imm-1;
+        if(pc->address >= INSTRUCTION_MEM_SIZE){
+            printf("PC out of instruction memory range\n");
+            return -1;
+        }
         printf("branching to %d \n", pc->address);
         // reset fetched and decoded because they will not be executed
         fetched = NULL;
@@ -396,9 +407,8 @@ int and(uint8_t operand1, uint8_t operand2){
     printf("and-ing  R%d and R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] & gprs->GPRegisters[operand2];
     printf("Result is %d\n", result);
-    sreg->C = 0;
-    sreg->V = 0;
-    updateNSZ(result);
+    
+    updateNZ(result);
     GPRsWrite(gprs, operand1, result);
     return 0;
 
@@ -407,17 +417,20 @@ int or(uint8_t operand1, uint8_t operand2){
     printf("or-ing  R%d and R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] | gprs->GPRegisters[operand2];
     printf("Result is %d", result);
-    sreg->C = 0;
-    sreg->V = 0;
-    updateNSZ(result);
+
+    updateNZ(result);
     GPRsWrite(gprs, operand1, result);
     return 0;
 
 }
 
-// TODO: figure out what happens if R1 || R2 is bigger than 1024
 int jr(uint8_t operand1, uint8_t operand2){
     pc->address = (gprs->GPRegisters[operand1] << 8) | gprs->GPRegisters[operand2];
+    if(pc->address >= INSTRUCTION_MEM_SIZE){
+        printf("PC out of instruction memory range after jump\n");
+        return -1;
+    }
+
     printf("jumping to %d\n", pc->address);
     // reset fetched and decoded because they will not be executed
     fetched = NULL;
@@ -431,9 +444,8 @@ int slc(uint8_t operand1, uint8_t imm){
     int result = (gprs->GPRegisters[operand1] << imm) |
             ((gprs->GPRegisters[operand1] >> (8-imm))/* & ((1<<imm) -1)*/ );
     printf("Result is %d\n", result);
-    sreg->C = 0;
-    sreg->V = checkBit(gprs->GPRegisters[operand1], 7) != checkBit(result, 7);
-    updateNSZ(result);
+
+    updateNZ(result);
     GPRsWrite(gprs, operand1, result);
     return 0;
 }
@@ -443,9 +455,8 @@ int src(uint8_t operand1, uint8_t imm){
     int result = (gprs->GPRegisters[operand1] >> imm) |
                                   (gprs->GPRegisters[operand1] << (8-imm));
     printf("Result is %d\n", result);
-    sreg->C = 0;
-    sreg->V = checkBit(gprs->GPRegisters[operand1], 7) != checkBit(result, 7);
-    updateNSZ(result);
+
+    updateNZ(result);
     GPRsWrite(gprs, operand1, result);
     return 0;
 }

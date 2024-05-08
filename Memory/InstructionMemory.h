@@ -20,7 +20,8 @@ typedef struct  {
  */
 void IMInit(InstructionMemory  **mem){
 //    *mem = calloc( INSTRUCTION_MEM_SIZE,2) ;
-    *mem = calloc(1, sizeof(InstructionMemory));
+    *mem = malloc(sizeof(InstructionMemory));
+    memset(*mem, -1, sizeof(InstructionMemory));
 }
 
 /**
