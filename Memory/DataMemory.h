@@ -36,7 +36,7 @@ uint16_t DMRead(DataMemory *mem, uint16_t address){
 }
 /**
  * Writing To DM
- * @param mem : refrence to the DM
+ * @param mem : reference to the DM
  * @param address : address is 16 bit because DATA_MEM_SIZE =2024 So
  *                  log(2024) =10.9 --> 16
  * @param data : data is 8 bit because WORD_SIZE = 8
@@ -47,6 +47,13 @@ void DMWrite(DataMemory *mem, uint16_t address, uint16_t data){
         return  ;
     }
     mem->Dmemory[address] = data ;
+}
+void DMPrint(DataMemory *mem){
+    // only 64 places are used in Data memory rest will be 0
+    for(int i = 0; i < 64; i++){
+        printf("0x%x- %d\n",i, mem->Dmemory[i]);
+    }
+
 }
 
 

@@ -39,7 +39,7 @@ uint16_t IMRead(InstructionMemory *mem, uint16_t address){
 }
 /**
  * Writing To IM
- * @param mem : refrence to the IM
+ * @param mem : reference to the IM
  * @param address : address is 16 bit because INSTRUCTION_MEM_SIZE =1024 So
  *                  log(1024) =10 --> 16
  * @param data : data is 16 bit because WORD_SIZE = 16
@@ -54,7 +54,7 @@ void IMWrite(InstructionMemory *mem, uint16_t address, uint16_t data){
 
 void IMPrint(InstructionMemory *mem){
     for (int i = 0; i < INSTRUCTION_MEM_SIZE; ++i) {
-        printf("%x\n",mem->Imemory[i]) ;
+        printf("0x%x- 0x%x\n",i, mem->Imemory[i]) ;
     }
 }
 

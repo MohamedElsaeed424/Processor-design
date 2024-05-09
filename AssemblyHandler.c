@@ -14,8 +14,19 @@
 
 #define MAX_LINE_LENGTH 100
 #define INSTRUCTION_SIZE_IN_BYTES 18
-InstructionsArr* IArr ;
-InstructionMemory * Imem ;
+
+/// Colors for UNIX Systems not Windows
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define BLU   "\x1B[34m"
+#define MAG   "\x1B[35m"
+#define CYN   "\x1B[36m"
+#define WHT   "\x1B[37m"
+#define RESET "\x1B[0m"
+
+InstructionsArr *IArr ;
+InstructionMemory *Imem ;
 PC *pc;
 GPRs *gprs;
 DataMemory *Dmem;
@@ -105,7 +116,7 @@ void ReadAssemblyTextFile() {
             }
         }
         int numberOfInstructions = instructionsArrIdx + 1;
-        numOfInstructions = numberOfInstructions ;// TODO: numofintruction habal
+        numOfInstructions = numberOfInstructions-1 ;// TODO: numofintruction habal
         fclose(file);
     }
 }
@@ -139,8 +150,9 @@ unsigned char decodeOperation(char *opcode) {
     } else if (strcmp(opcode,"SB") == 0) {
         return 0b1011;
     } else {
-        printf("This Opcode not exist in out ISA\n");
-        return 0xFF; // 0xFF as an error value
+        fprintf(stderr,"This instruction %s not exist in out ISA\n", opcode);
+        exit(EXIT_FAILURE);
+//        return 0xFF; // 0xFF as an error value
     }
 }
 
@@ -197,7 +209,7 @@ uint16_t decodeOneInstruction(Instruction i){
 
 void DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem){
     int length = sizeof(instArray->Instructions) / sizeof(instArray->Instructions[0]);
-    for (int i = 0; i < numOfInstructions-1; ++i) {
+    for (int i = 0; i < numOfInstructions; ++i) {
         IMWrite(mem, i,decodeOneInstruction(instArray->Instructions[i]))  ;
     }
 }
@@ -213,15 +225,12 @@ void DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem)
 //          based on the 4 bits of the operation will determine
 //      for the 4 bits . do the operation based on these 4 bits  0000 -> +
  **/
-int fetch(){
+
+void fetch(){
     fetched = &Imem->Imemory[pc->address++];
-    printf("fetched 0x%x\n", *fetched);
+    printf( "fetched 0x%x\n", *fetched);
     if(pc->address >= INSTRUCTION_MEM_SIZE)
         *fetched = -1;
-    if(*fetched == 0)
-        return 2;
-    else
-        return 2044;
 }
 void decode(){
     if(fetched){
@@ -260,26 +269,23 @@ void terminate(){
 int main(){
 
     init();
-    int next = 1044;
 
     while(1){
         printf("Clock Cycle %d\n", clock);
         printf("PC: %d\n", pc->address);
-        printf("inst: %x\n", Imem->Imemory[pc->address]);
         int status = execute();
         // status 1 means there was a jump
         if(status == 1){
             clock++;
+            printf("\n");
             continue;
         } else if(status == -1){
-            // status -1 means pc is out of range or terminate
+        // status -1 means pc is out of range or terminate
             break;
         }
 
         decode();
-        next = fetch();
-        if(clock > 24)
-            break;
+        fetch();
         clock++;
         printf("\n");
     }
@@ -291,7 +297,7 @@ int main(){
     terminate();
 }
 /**
- * updates N, S and Z flags of the status registers
+ * updates N and Z flags of the status registers
  */
 void updateNZ(int res){
     sreg->N = checkBit(res, 7);
@@ -308,6 +314,7 @@ int add(uint8_t operand1, uint8_t operand2){
     printf("adding R%d to R%d\n", operand2, operand1);
     int result = gprs->GPRegisters[operand1] + gprs->GPRegisters[operand2];
     printf("Result is %d\n", result);
+
     int posOp1 = checkBit(gprs->GPRegisters[operand1], 7);
     int posOp2 = checkBit(gprs->GPRegisters[operand2], 7);
     int posRes = checkBit(result, 7);
@@ -349,10 +356,10 @@ int sub(uint8_t operand1, uint8_t operand2){
  * @param operand2 the second register in the instruction
  */
 int mul(uint8_t operand1, uint8_t operand2){
-    printf("multiplying R%d to R%d\n", operand1, operand2);
+    printf("multiplying R%d into R%d\n", operand2, operand1);
     int result = gprs->GPRegisters[operand1] * gprs->GPRegisters[operand2];
     printf("Result is %d\n", result);
-    
+
     updateNZ(result);
 
     GPRsWrite(gprs, operand1, result);
@@ -407,7 +414,7 @@ int and(uint8_t operand1, uint8_t operand2){
     printf("and-ing  R%d and R%d\n", operand1, operand2);
     int result = gprs->GPRegisters[operand1] & gprs->GPRegisters[operand2];
     printf("Result is %d\n", result);
-    
+
     updateNZ(result);
     GPRsWrite(gprs, operand1, result);
     return 0;
@@ -440,7 +447,7 @@ int jr(uint8_t operand1, uint8_t operand2){
 }
 int slc(uint8_t operand1, uint8_t imm){
     printf("Circular shift left R%d by %d\n", operand1, imm);
-    // TODO: unsigned shift to be tested
+
     int result = (gprs->GPRegisters[operand1] << imm) |
             ((gprs->GPRegisters[operand1] >> (8-imm))/* & ((1<<imm) -1)*/ );
     printf("Result is %d\n", result);
