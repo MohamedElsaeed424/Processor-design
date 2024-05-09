@@ -166,7 +166,8 @@ unsigned char decodeFirstOperand(const char *firstOperand) {
 }
 
 unsigned char decodeImmediate(const char *value) {
-    int number = atoi(value + 1); // Skip the '#' character
+    // TODO: fix atoi with strtol
+    int number = atoi(value); // Skip the '#' character
     if (number > 63) {
         fprintf(stderr, "Error: Immediate value out of range.\n");
         exit(EXIT_FAILURE);
@@ -176,18 +177,9 @@ unsigned char decodeImmediate(const char *value) {
 unsigned char decodeSecondOperand(const char *secondOperand) {
     if(secondOperand[0] == 'R'){ // Register
         return decodeFirstOperand(secondOperand) ;
-    } else if (secondOperand[0] == '#') { // Immediate value
+    } else if (secondOperand[0] >= '0' && secondOperand[0] <= '9') { // Immediate value
         return decodeImmediate(secondOperand);
-    }else if (secondOperand[0] == '(') {
-        char addressOperand[20];
-        sscanf(secondOperand, "(%[^)])", addressOperand);
-        int addressValue = atoi(addressOperand);
-        if (addressValue > 63) {
-            fprintf(stderr, "Error: Address value out of range.\n");
-            exit(EXIT_FAILURE);
-        }
-        return (unsigned char)(addressValue & 0x3F);
-    }else {
+    } else {
         fprintf(stderr, "Error: Invalid secondOperand format.\n");
         exit(EXIT_FAILURE);
     }
