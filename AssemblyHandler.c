@@ -15,7 +15,7 @@
 #define MAX_LINE_LENGTH 100
 #define INSTRUCTION_SIZE_IN_BYTES 18
 
-/// Colors for UNIX Systems not Windows
+/// Colors for UNIX Systems
 #define RED   "\x1B[31m"
 #define GRN   "\x1B[32m"
 #define YEL   "\x1B[33m"
@@ -56,6 +56,7 @@ int sb(uint8_t operand1, uint8_t address);
 
 int (*opFuncs[])(uint8_t, uint8_t) = { add,  sub,  mul, ldi, beqz, and, or,
                                         jr, slc, src, lb, sb};
+/// ----------------------------------- start Assembly Parsing -----------------------------------
 /**
  * Reading from assembly text file and store all instructions
  * and secondOperands to array of instruction
@@ -225,7 +226,6 @@ void DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem)
 //      for the 4 bits . do the operation based on these 4 bits  0000 -> +
  **/
 uint8_t data_hazard(uint8_t reg){
-    // TODO: prints here?
     if(regUpdating == reg)
         // forward result of execution
         return result;
@@ -379,7 +379,7 @@ int mul(uint8_t operand1, uint8_t operand2){
     printf("multiplying R%d into R%d\n", operand2, operand1);
     regUpdating = operand1;
 //    result = gprs->GPRegisters[operand1] * gprs->GPRegisters[operand2];
-    result = decoded->reg1 - decoded->reg2;
+    result = decoded->reg1 * decoded->reg2;
     printRes(result);
 
     updateNZ(result);
@@ -437,7 +437,8 @@ int beqz(uint8_t operand1, uint8_t imm){
 int and(uint8_t operand1, uint8_t operand2){
     printf("and-ing  R%d and R%d\n", operand1, operand2);
     regUpdating = operand1;
-    result = gprs->GPRegisters[operand1] & gprs->GPRegisters[operand2];
+//    result = gprs->GPRegisters[operand1] & gprs->GPRegisters[operand2];
+    result = decoded->reg1 & decoded->reg2;
     printRes(result);
 
     updateNZ(result);
@@ -448,7 +449,8 @@ int and(uint8_t operand1, uint8_t operand2){
 int or(uint8_t operand1, uint8_t operand2){
     printf("or-ing  R%d and R%d\n", operand1, operand2);
     regUpdating = operand1;
-    result = gprs->GPRegisters[operand1] | gprs->GPRegisters[operand2];
+//    result = gprs->GPRegisters[operand1] | gprs->GPRegisters[operand2];
+    result = decoded->reg1 | decoded->reg2;
     printRes(result);
 
     updateNZ(result);
@@ -459,7 +461,8 @@ int or(uint8_t operand1, uint8_t operand2){
 
 int jr(uint8_t operand1, uint8_t operand2){
     regUpdating = -1;
-    pc->address = (gprs->GPRegisters[operand1] << 8) | gprs->GPRegisters[operand2];
+//    pc->address = (gprs->GPRegisters[operand1] << 8) | gprs->GPRegisters[operand2];
+    pc->address = (decoded->reg1 << 8) | decoded->reg2;
     if(pc->address >= INSTRUCTION_MEM_SIZE){
         printf("PC out of instruction memory range after jump\n");
         return -1;
@@ -476,8 +479,9 @@ int slc(uint8_t operand1, uint8_t imm){
     printf("Circular shift left R%d by %d\n", operand1, imm);
     regUpdating = operand1;
 
-    result = (gprs->GPRegisters[operand1] << imm) |
-            ((gprs->GPRegisters[operand1] >> (8-imm))/* & ((1<<imm) -1)*/ );
+//    result = (gprs->GPRegisters[operand1] << imm) |
+//            ((gprs->GPRegisters[operand1] >> (8-imm))/* & ((1<<imm) -1)*/ );
+    result = (decoded->reg1 << 8) | (decoded->reg2 >> (8-imm));
     printRes(result);
 
     updateNZ(result);
@@ -488,8 +492,9 @@ int slc(uint8_t operand1, uint8_t imm){
 int src(uint8_t operand1, uint8_t imm){
     printf("Circular shift right R%d by %d\n", operand1, imm);
     regUpdating = operand1;
-    result = (gprs->GPRegisters[operand1] >> imm) |
-                                  (gprs->GPRegisters[operand1] << (8-imm));
+//    result = (gprs->GPRegisters[operand1] >> imm) |
+//                                  (gprs->GPRegisters[operand1] << (8-imm));
+    result = (decoded->reg1 >> imm) | (decoded->reg2 << (8-imm));
     printRes(result);
 
     updateNZ(result);
