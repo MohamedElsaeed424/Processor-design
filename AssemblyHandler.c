@@ -303,6 +303,7 @@ int main(){
     }
 
     IMPrint(Imem);
+    DMPrint(Dmem);
     GPRsPrint(gprs);
     printf("PC = %d\n", pc->address);
     printStatus(sreg);
@@ -481,7 +482,7 @@ int slc(uint8_t operand1, uint8_t imm){
 
 //    result = (gprs->GPRegisters[operand1] << imm) |
 //            ((gprs->GPRegisters[operand1] >> (8-imm))/* & ((1<<imm) -1)*/ );
-    result = (decoded->reg1 << 8) | (decoded->reg2 >> (8-imm));
+    result = (decoded->reg1 << imm) | (decoded->reg2 >> (8-imm));
     printRes(result);
 
     updateNZ(result);
@@ -510,7 +511,7 @@ int lb(uint8_t operand1, uint8_t address){
 }
 int sb(uint8_t operand1, uint8_t address){
     regUpdating = -1;
-    printf("storing byte %d from R%d into memory address %d\n", gprs->GPRegisters[operand1], address, operand1);
+    printf("storing byte %d from R%d into memory address %d\n", (char)gprs->GPRegisters[operand1], operand1, address);
     Dmem->Dmemory[address] = gprs->GPRegisters[operand1];
     return 0;
 }

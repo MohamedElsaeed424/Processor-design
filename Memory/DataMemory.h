@@ -50,7 +50,7 @@ void DMWrite(DataMemory *mem, uint16_t address, uint16_t data){
 }
 void DMPrint(DataMemory *mem){
     // only 64 places are used in Data memory rest will be 0
-    for(int i = 0; i < 64; i++){
+    for(int i = 0; i < DATA_MEM_SIZE; i++){
         printf("0x%x- %d\n",i, mem->Dmemory[i]);
     }
 
