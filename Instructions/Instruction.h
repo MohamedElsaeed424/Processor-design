@@ -36,7 +36,10 @@ typedef struct {
     unsigned char opcode;
     unsigned char operand1;
     unsigned char operand2;
+    uint8_t reg1;
+    uint8_t reg2;
 } DecodedInstruction;
+
 DecodedInstruction *decodeInstruction(uint16_t instruction){
     DecodedInstruction *decoded = malloc(sizeof(DecodedInstruction ));
     decoded->opcode = (instruction >> 12) & 0x000F;

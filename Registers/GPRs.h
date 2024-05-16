@@ -54,12 +54,12 @@ void GPRsWrite(GPRs *gprs, uint8_t address, uint8_t data){
         return ;
     }
     gprs->GPRegisters[address] = data ;
-    printf("writing %d to R%d\n",data, address);
+    printf("writing %d to R%d\n", (char)data, address);
 }
 
 void GPRsPrint(GPRs *gprs){
     for(int i = 0; i<64; i++){
-        printf("R%d = %d\n", i, gprs->GPRegisters[i]);
+        printf("R%d = %d\n", i, (char)gprs->GPRegisters[i]);
     }
 
 }
