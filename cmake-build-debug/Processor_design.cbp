@@ -84,12 +84,6 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="C:/Users/Mahmoud/CLionProjects/Processor-design/Instructions/I_Format.h">
-			<Option target="Processor-design"/>
-		</Unit>
-		<Unit filename="C:/Users/Mahmoud/CLionProjects/Processor-design/Instructions/R_Format.h">
-			<Option target="Processor-design"/>
-		</Unit>
 		<Unit filename="C:/Users/Mahmoud/CLionProjects/Processor-design/Memory/DataMemory.h">
 			<Option target="Processor-design"/>
 		</Unit>

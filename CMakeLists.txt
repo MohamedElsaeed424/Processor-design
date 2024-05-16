@@ -14,8 +14,6 @@ add_executable(
         Memory/InstructionMemory.h
         Registers/GPRs.h
         Registers/PC.h
-        Instructions/I_Format.h
-        Instructions/R_Format.h
         Registers/StatusRegister.h
         Registers/PC.h
         playground.c
