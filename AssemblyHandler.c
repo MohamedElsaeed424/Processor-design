@@ -165,7 +165,7 @@ unsigned char decodeFirstOperand(const char *firstOperand) {
         fprintf(stderr, "Error:Register R%d Doesn't exist.\n" , number);
         exit(EXIT_FAILURE);
     }
-    return (unsigned char)(number & 0x3F); // Mask the number to fit within 6 bits
+    return (unsigned char) number; // Mask the number to fit within 6 bits
 }
 
 unsigned char decodeImmediate(const char *value, int isSigned) {
@@ -178,12 +178,12 @@ unsigned char decodeImmediate(const char *value, int isSigned) {
         fprintf(stderr, "Error: Immediate value out of range.\n");
         exit(EXIT_FAILURE);
     }
-    return (unsigned char)(number & 0x3F);
+    return (unsigned char) number;
 }
 unsigned char decodeSecondOperand(const char *secondOperand, int isSigned) {
     if(secondOperand[0] == 'R'){ // Register
         return decodeFirstOperand(secondOperand) ;
-    } else if (secondOperand[0] >= '0' && secondOperand[0] <= '9') { // Immediate value
+    } else if ((secondOperand[0] >= '0' && secondOperand[0] <= '9') || secondOperand[0] == '-' ) { // Immediate value
         return decodeImmediate(secondOperand, isSigned);
     } else {
         fprintf(stderr, "Error: Invalid secondOperand format.\n");
