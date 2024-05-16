@@ -313,8 +313,8 @@ int main(){
  * updates N and Z flags of the status registers
  */
 void updateNZ(int res){
-    sreg->N = checkBit(res, 7);
-    sreg->Z = res == 0;
+    sreg->N = checkBit((char)res, 7);
+    sreg->Z = ((char)res) == 0;
     printStatus(sreg);
 }
 void printRes(int res){
@@ -396,7 +396,7 @@ int mul(uint8_t operand1, uint8_t operand2){
  * @param imm the value to load
  */
 int ldi(uint8_t operand1, uint8_t imm){
-    printf("loading value %d into R%d\n", imm, operand1);
+    printf("loading value %d into R%d\n", (char)imm, operand1);
     regUpdating = operand1;
     result = imm;
     GPRsWrite(gprs, operand1, imm);
