@@ -119,7 +119,7 @@ void ReadAssemblyTextFile() {
             }
         }
         int numberOfInstructions = instructionsArrIdx + 1;
-        numOfInstructions = numberOfInstructions-1 ;// TODO: numofintruction habal
+        numOfInstructions = numberOfInstructions-1 ;
         fclose(file);
     }
 }

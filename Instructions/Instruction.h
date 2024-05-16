@@ -36,6 +36,7 @@ typedef struct {
     unsigned char opcode;
     unsigned char operand1;
     unsigned char operand2;
+    uint8_t immSigned;
     uint8_t reg1;
     uint8_t reg2;
 } DecodedInstruction;
@@ -48,8 +49,9 @@ DecodedInstruction *decodeInstruction(uint16_t instruction){
     decoded->opcode = (instruction >> 12) & 0x000F;
     decoded->operand1 = (instruction >> 6) & 0x003F;
     decoded->operand2 = instruction & 0x003F;
+
     if(checkBit(decoded->operand2, 5) != 0)
-        decoded->operand2 |= 0b11000000;
+        decoded->immSigned |= 0b11000000;
     return decoded;
 }
 
