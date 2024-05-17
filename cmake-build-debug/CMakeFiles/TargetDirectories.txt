@@ -1,3 +1,3 @@
-C:/Users/Mahmoud/CLionProjects/Processor-design/cmake-build-debug/CMakeFiles/Processor-design.dir
-C:/Users/Mahmoud/CLionProjects/Processor-design/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Mahmoud/CLionProjects/Processor-design/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+D:/Coding/C_Programing/Project _Team_15_Code/cmake-build-debug/CMakeFiles/Processor-design.dir
+D:/Coding/C_Programing/Project _Team_15_Code/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/Coding/C_Programing/Project _Team_15_Code/cmake-build-debug/CMakeFiles/rebuild_cache.dir
