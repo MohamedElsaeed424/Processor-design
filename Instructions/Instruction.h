@@ -36,7 +36,7 @@ typedef struct {
     unsigned char opcode;
     unsigned char operand1;
     unsigned char operand2;
-    uint8_t immSigned;
+    char immSigned;
     uint8_t reg1;
     uint8_t reg2;
 } DecodedInstruction;
@@ -46,15 +46,21 @@ int checkBit(int x, int i){
     // x = 11001001
     //     01000000
 }
-
+/**
+ * decodes the instruction given into the four fields
+ * opcode, operand1, operand2, immSigned
+ * @param instruction the instruction to be decoded
+ * @return the decoded instruction in a struct
+ */
 DecodedInstruction *decodeInstruction(uint16_t instruction){
     DecodedInstruction *decoded = malloc(sizeof(DecodedInstruction ));
     decoded->opcode = (instruction >> 12) & 0x000F;
     decoded->operand1 = (instruction >> 6) & 0x003F;
-    decoded->operand2 = instruction & 0x003F;
+    decoded->operand2 = decoded->immSigned = instruction & 0x003F;
+
 
     if(checkBit(decoded->operand2, 5) != 0)
-        decoded->immSigned |= 0b11000000;
+        decoded->immSigned = decoded->operand2 | 0b11000000;
     return decoded;
 }
 
