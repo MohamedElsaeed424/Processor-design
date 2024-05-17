@@ -43,7 +43,10 @@ typedef struct {
 
 int checkBit(int x, int i){
     return (x & (1<<i)) != 0;
+    // x = 11001001
+    //     01000000
 }
+
 DecodedInstruction *decodeInstruction(uint16_t instruction){
     DecodedInstruction *decoded = malloc(sizeof(DecodedInstruction ));
     decoded->opcode = (instruction >> 12) & 0x000F;

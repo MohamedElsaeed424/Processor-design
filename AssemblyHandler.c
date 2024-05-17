@@ -169,12 +169,11 @@ unsigned char decodeFirstOperand(const char *firstOperand) {
 }
 
 unsigned char decodeImmediate(const char *value, int isSigned) {
-    // TODO: fix atoi with strtol
     int number = atoi(value); // Skip the '#' character
     int range1 = isSigned? -32: 0;
     int range2 = isSigned? 31: 63;
 
-    if (number > range2 || number < range1) {
+    if (number < range1 || number > range2) {
         fprintf(stderr, "Error: Immediate value out of range.\n");
         exit(EXIT_FAILURE);
     }
@@ -257,6 +256,7 @@ int execute(){
             return -1;
         return opFuncs[decoded->opcode] (decoded->operand1, decoded->operand2);
     }
+    return 0;
 }
 
 
@@ -317,7 +317,7 @@ void updateNZ(int res){
     sreg->Z = ((char)res) == 0;
     printStatus(sreg);
 }
-void printRes(int res){
+void printRes(){
     printf("Result is %d\n", (char)result);
 }
 // TODO: use read values of registers
@@ -328,14 +328,13 @@ void printRes(int res){
  * @param operand2 the second register in the instruction
  */
 int add(uint8_t operand1, uint8_t operand2){
-    printf("adding R%d to R%d\n", operand2, operand1);
-    regUpdating = operand1;
-//    result = gprs->GPRegisters[operand1] + gprs->GPRegisters[operand2];
+    printf("adding R%d to R%d\n", decoded->operand2, decoded->operand1);
+    regUpdating = decoded->operand1;
     result = decoded->reg1 + decoded->reg2;
-    printRes(result);
+    printRes();
 
-    int posOp1 = checkBit(gprs->GPRegisters[operand1], 7);
-    int posOp2 = checkBit(gprs->GPRegisters[operand2], 7);
+    int posOp1 = checkBit(decoded->reg1, 7);
+    int posOp2 = checkBit(decoded->reg2, 7);
     int posRes = checkBit(result, 7);
 
     sreg->C = checkBit(result, 8);
@@ -357,12 +356,12 @@ int sub(uint8_t operand1, uint8_t operand2){
     regUpdating = operand1;
 //    result = gprs->GPRegisters[operand1] - gprs->GPRegisters[operand2];
     result = decoded->reg1 - decoded->reg2;
-    printRes(result);
-    int posOp1 = checkBit(gprs->GPRegisters[operand1], 7);
-    int posOp2 = checkBit(gprs->GPRegisters[operand2], 7);
+    printRes();
+    int posOp1 = checkBit(decoded->reg1, 7);
+    int posOp2 = checkBit(decoded->reg2, 7);
     int posRes = checkBit(result, 7);
 
-    sreg->V = posOp1 != posOp2 && posRes == posOp2 ;
+    sreg->V = posOp1 != posOp2 && posRes == posOp2;
     sreg->S = sreg->N ^ sreg->V;
     updateNZ(result);
 
@@ -381,7 +380,7 @@ int mul(uint8_t operand1, uint8_t operand2){
     regUpdating = operand1;
 //    result = gprs->GPRegisters[operand1] * gprs->GPRegisters[operand2];
     result = decoded->reg1 * decoded->reg2;
-    printRes(result);
+    printRes();
 
     updateNZ(result);
 
@@ -396,10 +395,10 @@ int mul(uint8_t operand1, uint8_t operand2){
  * @param imm the value to load
  */
 int ldi(uint8_t operand1, uint8_t imm){
-    printf("loading value %d into R%d\n", (char)imm, operand1);
+    printf("loading value %d into R%d\n", (char)decoded->immSigned, operand1);
     regUpdating = operand1;
-    result = imm;
-    GPRsWrite(gprs, operand1, imm);
+    result = decoded->immSigned;
+    GPRsWrite(gprs, operand1, decoded->immSigned);
     return 0;
 
 }
@@ -411,10 +410,10 @@ int ldi(uint8_t operand1, uint8_t imm){
  */
 // TODO: pc value correct?
 int beqz(uint8_t operand1, uint8_t imm){
-    printf("checking if R%d = 0\n", operand1);
+    printf("checking if R%d = 0\n", decoded->operand1);
     regUpdating = -1;
     if(/*gprs->GPRegisters[operand1] */ decoded->reg1 == 0){
-        pc->address += imm-1;
+        pc->address += decoded->immSigned-1;
         if(pc->address >= INSTRUCTION_MEM_SIZE){
             printf("PC out of instruction memory range\n");
             return -1;
@@ -440,7 +439,7 @@ int and(uint8_t operand1, uint8_t operand2){
     regUpdating = operand1;
 //    result = gprs->GPRegisters[operand1] & gprs->GPRegisters[operand2];
     result = decoded->reg1 & decoded->reg2;
-    printRes(result);
+    printRes();
 
     updateNZ(result);
     GPRsWrite(gprs, operand1, result);
@@ -452,7 +451,7 @@ int or(uint8_t operand1, uint8_t operand2){
     regUpdating = operand1;
 //    result = gprs->GPRegisters[operand1] | gprs->GPRegisters[operand2];
     result = decoded->reg1 | decoded->reg2;
-    printRes(result);
+    printRes();
 
     updateNZ(result);
     GPRsWrite(gprs, operand1, result);
@@ -483,7 +482,7 @@ int slc(uint8_t operand1, uint8_t imm){
 //    result = (gprs->GPRegisters[operand1] << imm) |
 //            ((gprs->GPRegisters[operand1] >> (8-imm))/* & ((1<<imm) -1)*/ );
     result = (decoded->reg1 << imm) | (decoded->reg2 >> (8-imm));
-    printRes(result);
+    printRes();
 
     updateNZ(result);
     GPRsWrite(gprs, operand1, result);
@@ -496,7 +495,7 @@ int src(uint8_t operand1, uint8_t imm){
 //    result = (gprs->GPRegisters[operand1] >> imm) |
 //                                  (gprs->GPRegisters[operand1] << (8-imm));
     result = (decoded->reg1 >> imm) | (decoded->reg2 << (8-imm));
-    printRes(result);
+    printRes();
 
     updateNZ(result);
     GPRsWrite(gprs, operand1, result);
@@ -505,7 +504,7 @@ int src(uint8_t operand1, uint8_t imm){
 int lb(uint8_t operand1, uint8_t address){
     regUpdating = operand1;
     result = Dmem->Dmemory[address];
-    printf("loading byte %d from memory address %d into R%d\n", Dmem->Dmemory[address], address, operand1);
+    printf("loading byte %d from memory address %d into R%d\n", (char)Dmem->Dmemory[address], address, operand1);
     GPRsWrite(gprs, operand1, Dmem->Dmemory[address]);
     return 0;
 }
