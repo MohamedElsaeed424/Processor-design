@@ -16,5 +16,5 @@ add_executable(
         Registers/PC.h
         Registers/StatusRegister.h
         Registers/PC.h
-        playground.c
+        main.c
 )

@@ -99,7 +99,7 @@
 		<Unit filename="C:/Users/Mahmoud/CLionProjects/Processor-design/Registers/StatusRegister.h">
 			<Option target="Processor-design"/>
 		</Unit>
-		<Unit filename="C:/Users/Mahmoud/CLionProjects/Processor-design/playground.c">
+		<Unit filename="C:/Users/Mahmoud/CLionProjects/Processor-design/main.c">
 			<Option target="Processor-design"/>
 		</Unit>
 		<Unit filename="C:/Users/Mahmoud/CLionProjects/Processor-design/CMakeLists.txt">

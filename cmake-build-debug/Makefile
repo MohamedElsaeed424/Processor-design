@@ -128,29 +128,29 @@ Processor-design/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Processor-design.dir\build.make CMakeFiles/Processor-design.dir/build
 .PHONY : Processor-design/fast
 
-playground.obj: playground.c.obj
-.PHONY : playground.obj
+main.obj: main.c.obj
+.PHONY : main.obj
 
 # target to build an object file
-playground.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Processor-design.dir\build.make CMakeFiles/Processor-design.dir/playground.c.obj
-.PHONY : playground.c.obj
+main.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Processor-design.dir\build.make CMakeFiles/Processor-design.dir/main.c.obj
+.PHONY : main.c.obj
 
-playground.i: playground.c.i
-.PHONY : playground.i
+main.i: main.c.i
+.PHONY : main.i
 
 # target to preprocess a source file
-playground.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Processor-design.dir\build.make CMakeFiles/Processor-design.dir/playground.c.i
-.PHONY : playground.c.i
+main.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Processor-design.dir\build.make CMakeFiles/Processor-design.dir/main.c.i
+.PHONY : main.c.i
 
-playground.s: playground.c.s
-.PHONY : playground.s
+main.s: main.c.s
+.PHONY : main.s
 
 # target to generate assembly for a file
-playground.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Processor-design.dir\build.make CMakeFiles/Processor-design.dir/playground.c.s
-.PHONY : playground.c.s
+main.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Processor-design.dir\build.make CMakeFiles/Processor-design.dir/main.c.s
+.PHONY : main.c.s
 
 # Help Target
 help:
@@ -161,9 +161,9 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... Processor-design
-	@echo ... playground.obj
-	@echo ... playground.i
-	@echo ... playground.s
+	@echo ... main.obj
+	@echo ... main.i
+	@echo ... main.s
 .PHONY : help
 
 
