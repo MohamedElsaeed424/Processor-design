@@ -7,6 +7,7 @@ include_directories(.)
 include_directories(Memory)
 include_directories(Registers)
 include_directories(Instructions)
+include_directories(Tests)
 
 add_executable(
         Processor-design

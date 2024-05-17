@@ -28,6 +28,7 @@
 					<Add directory="C:/Users/Mahmoud/CLionProjects/Processor-design/Memory"/>
 					<Add directory="C:/Users/Mahmoud/CLionProjects/Processor-design/Registers"/>
 					<Add directory="C:/Users/Mahmoud/CLionProjects/Processor-design/Instructions"/>
+					<Add directory="C:/Users/Mahmoud/CLionProjects/Processor-design/Tests"/>
 					<Add directory="C:/Program Files/JetBrains/CLion 2023.3.4/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include"/>
 					<Add directory="C:/Program Files/JetBrains/CLion 2023.3.4/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/../../../../include"/>
 					<Add directory="C:/Program Files/JetBrains/CLion 2023.3.4/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed"/>
@@ -51,6 +52,7 @@
 					<Add directory="C:/Users/Mahmoud/CLionProjects/Processor-design/Memory"/>
 					<Add directory="C:/Users/Mahmoud/CLionProjects/Processor-design/Registers"/>
 					<Add directory="C:/Users/Mahmoud/CLionProjects/Processor-design/Instructions"/>
+					<Add directory="C:/Users/Mahmoud/CLionProjects/Processor-design/Tests"/>
 					<Add directory="C:/Program Files/JetBrains/CLion 2023.3.4/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include"/>
 					<Add directory="C:/Program Files/JetBrains/CLion 2023.3.4/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/../../../../include"/>
 					<Add directory="C:/Program Files/JetBrains/CLion 2023.3.4/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed"/>

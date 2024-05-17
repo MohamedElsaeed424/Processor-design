@@ -66,8 +66,8 @@ int (*opFuncs[])() = { add,  sub,  mul, ldi, beqz, and, or,
  * and secondOperands to array of instruction
  * @return
  */
-void ReadAssemblyTextFile() {
-    char fileName[] = "AssemblyProgramm.txt";
+void ReadAssemblyTextFile(char fileName[]) {
+//    char fileName[] = "AssemblyProgramm.txt";
     FILE *file = fopen(fileName, "r");
     if (file == NULL) {
         perror("Error opening file");
@@ -282,8 +282,8 @@ int execute(){
 /**
  * initializes the program by reading the assembly text file and allocating memory
  */
-void init(){
-    ReadAssemblyTextFile() ;
+void init(char path[]){
+    ReadAssemblyTextFile(path) ;
     IMInit(&Imem) ;
     DecodeAllInstructions(IArr,Imem) ;
     PCInit(&pc);
@@ -302,9 +302,17 @@ void terminate(){
     free(sreg);
     free(decoded);
 }
-int main(){
+int main(int argc, char *argv[]){
+//    if(argc < 2){
+//        printf("please input path of assembly program\n");
+//        return 1;
+//    }
+    char programFile[100];
+    printf("Enter the program file path: ");
+    scanf("%s", programFile);
 
-    init();
+
+    init(programFile);
     printf("-----------------Start of execution--------------------\n");
     while(1){
         printf("Clock Cycle %d\n", clock);
