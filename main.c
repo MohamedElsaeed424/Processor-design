@@ -308,7 +308,7 @@ int main(int argc, char *argv[]){
 //        return 1;
 //    }
     char programFile[100];
-    printf("Enter the program file path: ");
+    printf("Enter the program file path:\n");
     scanf("%s", programFile);
 
 
