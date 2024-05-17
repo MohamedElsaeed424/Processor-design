@@ -8,7 +8,7 @@
 #endif //PROCESSOR_DESIGN_INSTRUCTION_H
 #define INSTRUCTION_MEM_SIZE 1024
 
-// ADDZR1\0R2
+
 typedef struct {
     char operation[5] ;
     char firstOp[4] ; // Reg
@@ -56,11 +56,12 @@ DecodedInstruction *decodeInstruction(uint16_t instruction){
     DecodedInstruction *decoded = malloc(sizeof(DecodedInstruction ));
     decoded->opcode = (instruction >> 12) & 0x000F;
     decoded->operand1 = (instruction >> 6) & 0x003F;
-    decoded->operand2 = decoded->immSigned = instruction & 0x003F;
+    decoded->operand2 = instruction & 0x003F;
+    decoded->immSigned = (char) decoded->operand2;
 
 
     if(checkBit(decoded->operand2, 5) != 0)
-        decoded->immSigned = decoded->operand2 | 0b11000000;
+        decoded->immSigned = (char) (decoded->operand2 | 0b11000000);
     return decoded;
 }
 

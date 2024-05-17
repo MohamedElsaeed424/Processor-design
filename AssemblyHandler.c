@@ -34,8 +34,12 @@ SREG *sreg;
 
 int clock = 1;
 int numOfInstructions = 0  ;
+
+/// IF/ID
 uint16_t *fetched = NULL ;
+/// ID/EX
 DecodedInstruction* decoded = NULL;
+/// Output from EX
 int regUpdating = -1;
 int result;
 
@@ -103,11 +107,9 @@ void ReadAssemblyTextFile() {
                         strcpy(I.operation, instruction);
                         strcpy(I.firstOp, secondOperand1);
                         strcpy(I.secondOp, secondOperand2);
-//                    printf("%s %s %s \n" ,I.operation, I.firstOp ,I.secondOp ) ;
                         InstructionArrWrite(IArr, I, instructionsArrIdx);
                         ++instructionsArrIdx;
                         // Print or process the parsed instruction and secondOperands
-//                    printf("Instruction: %s, Operand1: %s, Operand2: %s\n", instruction, secondOperand1, secondOperand2);
                     } else {
                         printf("Error: Invalid format in line\n");
                     }
@@ -220,6 +222,7 @@ void DecodeAllInstructions(InstructionsArr* instArray , InstructionMemory * mem)
     for (int i = 0; i < numOfInstructions; ++i) {
         IMWrite(mem, i,decodeOneInstruction(instArray->Instructions[i]))  ;
     }
+    free(IArr) ;
 }
 /// -------------------------end Assembly parsing-----------------------------------------
 
@@ -292,7 +295,6 @@ void init(){
  * frees all allocated memory at the end of the program
  */
 void terminate(){
-    free(IArr) ;
     free(Imem) ;
     free(pc) ;
     free(gprs) ;
@@ -333,7 +335,8 @@ int main(){
     terminate();
 }
 /**
- * updates N and Z flags of the status registers
+ * updates N , S and Z flags of the status registers
+ * and prints the status register
  */
 void updateNZ(int res, int s){
     sreg->N = checkBit((char)res, 7);
@@ -347,6 +350,7 @@ void printRes(){
 /**
  * Performs the addition instruction (ie. ADD R1 R2).
  * Adds register R2 to register R1
+ * @return 0
  */
 int add(){
     printf("adding R%d to R%d\n", decoded->operand2, decoded->operand1);
@@ -368,6 +372,7 @@ int add(){
 /**
  * Performs the subtraction instruction (ie. SUB R1 R2).
  * subtracts register R2 from register R1 and stores result in R1
+ * @return 0
  */
 int sub(){
     printf("subtracting R%d from R%d\n", decoded->operand2, decoded->operand1);
@@ -389,8 +394,7 @@ int sub(){
 /**
  * Performs the multiplication instruction (ie. MUL R1 R2).
  * Multiplies register R2 to register R1
- * @param operand1 the first register in the instruction
- * @param operand2 the second register in the instruction
+ * @return 0
  */
 int mul(){
     printf("multiplying R%d into R%d\n", decoded->operand2, decoded->operand1);
@@ -408,8 +412,7 @@ int mul(){
 /**
  * Performs the LDI instruction
  * loads an immediate value into the specified register
- * @param operand1 the register to be loaded
- * @param imm the value to load
+ * @return 0
  */
 int ldi(){
     printf("loading value %d into R%d\n", (char)decoded->immSigned, decoded->operand1);
@@ -422,8 +425,9 @@ int ldi(){
 /**
  * Performs the BEQZ instruction
  * if the register contains 0 then jumps relative the the current pc
- * @param operand1 the register to be checked
- * @param imm the value to jump
+ * @return returns -1 (terminate) if pc out of range after jumping
+ * @return returns 1 if branch occurred
+ * @return returns 0 if no branch occurred
  */
 int beqz(){
     printf("checking if R%d = 0\n", decoded->operand1);
@@ -446,9 +450,8 @@ int beqz(){
 }
 /**
  * Performs the AND instruction
- * Does a bitwise and on two registers and stores
- * @param operand1
- * @param operand2
+ * Does a bitwise and on two registers and stores the result
+ * @return 0
  */
 int and(){
     printf("and-ing  R%d and R%d\n", decoded->operand1, decoded->operand2);
@@ -462,6 +465,11 @@ int and(){
     return 0;
 
 }
+/**
+ * Performs the OR instruction
+ * Does a bitwise or on two registers and stores the result
+ * @return 0
+ */
 int or(){
     printf("or-ing  R%d and R%d\n", decoded->operand1, decoded->operand2);
     regUpdating = decoded->operand1;
@@ -474,7 +482,10 @@ int or(){
     return 0;
 
 }
-
+/**
+ * Performs the jump JR instruction
+ * @return returns -1 if pc out of range and 1 otherwise
+ */
 int jr(){
     regUpdating = -1;
 //    pc->address = (gprs->GPRegisters[operand1] << 8) | gprs->GPRegisters[operand2];
@@ -491,6 +502,10 @@ int jr(){
     decoded = NULL;
     return 1;
 }
+/**
+ * Performs the circular shift left SLC instruction
+ * @return 0
+ */
 int slc(){
     printf("Circular shift left R%d by %d\n", decoded->operand1, decoded->operand2);
     regUpdating = decoded->operand1;
@@ -504,7 +519,10 @@ int slc(){
     GPRsWrite(gprs, decoded->operand1, result);
     return 0;
 }
-
+/**
+ * Performs the circular shift right SRC instruction
+ * @return 0
+ */
 int src(){
     printf("Circular shift right R%d by %d\n", decoded->operand1, decoded->operand2);
     regUpdating = decoded->operand1;
@@ -517,6 +535,10 @@ int src(){
     GPRsWrite(gprs, decoded->operand1, result);
     return 0;
 }
+/**
+ * Performs the load byte LB instruction
+ * @return 0
+ */
 int lb(){
     regUpdating = decoded->operand1;
     result = Dmem->Dmemory[decoded->operand2];
@@ -526,6 +548,10 @@ int lb(){
     GPRsWrite(gprs, decoded->operand1, result);
     return 0;
 }
+/**
+ * Performs the store byte SB instruction
+ * @return 0
+ */
 int sb(){
     regUpdating = -1;
     printf("storing byte %d from R%d into memory address %d\n",
